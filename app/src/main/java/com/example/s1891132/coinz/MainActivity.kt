@@ -1,9 +1,12 @@
 package com.example.s1891132.coinz
 
+import android.content.Context
+import android.content.Intent
 import android.location.Location
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.util.Log
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineListener
 import com.mapbox.android.core.location.LocationEnginePriority
@@ -23,6 +26,10 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
 class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineListener{
 
 
+    private val tag= "MainActivity"
+    //private var downloadDate=""//Format:YYYY/MM/DD
+    //private val preferencesFile="MarkersInfo"//for storing preferences
+
     private lateinit var mapView: MapView
     private lateinit var map: MapboxMap
     private lateinit var permissionsManager: PermissionsManager
@@ -30,17 +37,35 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
     private var locationEngine: LocationEngine?=null
     private var locationLayerPlugin: LocationLayerPlugin?=null
 
+    private var downloadMap: DownloadFileTask=DownloadFileTask(DownloadCompleteRunner)//is it possible to be null???
+    private var coinzFile="CoinzGeoInfoToday"
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Mapbox.getInstance(applicationContext,getString(R.string.access_token))
         mapView=findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
+        //Is it appropriate to be here??? i mean you quit the app and you have to download it again i guess
+        //to login in
+        val intentToLogin= Intent()
+        intentToLogin.setClass(this,LogInActivity::class.java)
+        startActivity(intentToLogin)
+        downloadMap.execute(CurrentUrl())//here needs a string buildeR to change the date
         mapView.getMapAsync{mapboxMap ->
             map=mapboxMap
             enableLocation()
         }
+
+
+        //Log.i("download",DownloadCompleteRunner.result)//debug
+        //i think the point is they didn't finish the download and it directly goes down to here
+        //so to solve it:1.write shared preference in object 2:wait for the background(but how???)
+        //getMap(DownloadCompleteRunner.result)
     }
+
+
 
     fun enableLocation(){
         if(PermissionsManager.areLocationPermissionsGranted(this))
@@ -109,6 +134,21 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
      locationEngine?.requestLocationUpdates()
     }
 
+    /*fun getMap(storeInfo:String?){
+        val settings= getSharedPreferences(coinzFile,Context.MODE_PRIVATE)
+        val editor= settings.edit()
+        editor.putString("CoinzStoreInfo",storeInfo)
+        editor.apply()
+        Log.i("getMap",storeInfo)
+
+
+
+    }*/
+
+
+
+
+
     @SuppressWarnings("MissingPermission")
     override fun onStart() {
         super.onStart()
@@ -118,6 +158,10 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
 
         }
         mapView.onStart()
+        //val settings=getSharedPreferences(preferencesFile, Context.MODE_PRIVATE)//restore preferences
+        //downloadDate=settings.getString("lastDownloadDate","")//use ""as default value(this might be the first time the app is run)
+        //Log.d(tag,"[onStart] Recalled lastDownloadDate is '$downloadDate'")
+
     }
 
     override fun onResume() {
@@ -132,6 +176,14 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
 
     override fun onStop() {
         super.onStop()
+        //Log.d(tag,"[onStop] Storing lastDownloadDate of $downloadDate")
+        //All objets are from android.context.Context
+        //val settings=getSharedPreferences(preferencesFile,Context.MODE_PRIVATE)
+        //We need an Editor object to make preference changes.
+        //val editor=settings.edit()
+        //editor.putString("lastDownloadDate",downloadDate)
+        //apply the edits
+        //editor.apply()
         locationEngine?.removeLocationUpdates()
         locationLayerPlugin?.onStop()
         mapView.onStop()
