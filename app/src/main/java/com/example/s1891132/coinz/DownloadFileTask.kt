@@ -18,7 +18,7 @@ object DownloadCompleteRunner:DownloadCompleteListener{
     var result:String?=null//?
     override fun downloadComplete(result:String){
         this.result=result
-        //Log.i("download",result)//log
+        Log.i("download",result)//log
         //here result is what you want? to store it in the local preference file
     }
 }

@@ -49,9 +49,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         mapView.onCreate(savedInstanceState)
         //Is it appropriate to be here??? i mean you quit the app and you have to download it again i guess
         //to login in
-        val intentToLogin= Intent()
-        intentToLogin.setClass(this,LogInActivity::class.java)
-        startActivity(intentToLogin)
+        startActivity(Intent(this@MainActivity,LogInActivity::class.java))
         downloadMap.execute(CurrentUrl())//here needs a string buildeR to change the date
         mapView.getMapAsync{mapboxMap ->
             map=mapboxMap
