@@ -51,18 +51,17 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         //to login in
 
         //if have user instance now, stop this intent, add a pending situation
-        startActivity(Intent(this@MainActivity,LogInActivity::class.java))
-        downloadMap.execute(CurrentUrl())//here needs a string buildeR to change the date
+        //startActivity(Intent(this@MainActivity,LogInActivity::class.java))
+        downloadMap.execute(currentUrl())
         mapView.getMapAsync{mapboxMap ->
             map=mapboxMap
             enableLocation()
+            //if have files for today, do not need to store
+            storeCoinz(DownloadCompleteRunner.result)
+
+
         }
 
-
-        //Log.i("download",DownloadCompleteRunner.result)//debug
-        //i think the point is they didn't finish the download and it directly goes down to here
-        //so to solve it:1.write shared preference in object 2:wait for the background(but how???)
-        //getMap(DownloadCompleteRunner.result)
     }
 
 
@@ -90,6 +89,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         {
             originLocation=lastLocation
             setCameraPosition(lastLocation)
+
         }else{
             locationEngine?.addLocationEngineListener(this)
         }
@@ -105,6 +105,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
     }
 
     private fun setCameraPosition(location: Location){
+
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude,location.longitude),15.0))
     }
 
@@ -126,24 +127,25 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
        location?.let {
            originLocation=location
            setCameraPosition(location)
+
        }
     }
 
 @SuppressWarnings("MissingPermission")
     override fun onConnected() {
      locationEngine?.requestLocationUpdates()
+
+
+
     }
 
-    /*fun getMap(storeInfo:String?){
-        val settings= getSharedPreferences(coinzFile,Context.MODE_PRIVATE)
-        val editor= settings.edit()
-        editor.putString("CoinzStoreInfo",storeInfo)
+
+    fun storeCoinz(data:String?){
+        val editor=getSharedPreferences(coinzFile, Context.MODE_PRIVATE).edit()
+        editor.putString(currentDate(),data)
         editor.apply()
-        Log.i("getMap",storeInfo)
+    }
 
-
-
-    }*/
 
 
 
@@ -155,6 +157,8 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         if(PermissionsManager.areLocationPermissionsGranted(this)){
             locationEngine?.requestLocationUpdates()
             locationLayerPlugin?.onStart()
+            Log.i("maptest","here3")
+
 
         }
         mapView.onStart()

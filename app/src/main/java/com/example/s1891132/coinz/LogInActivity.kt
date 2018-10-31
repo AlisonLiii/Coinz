@@ -46,8 +46,6 @@ class LogInActivity : AppCompatActivity() {
        register.setOnClickListener {
             startActivity(Intent(this@LogInActivity,RegisterActivity::class.java))
         }
-        //val a=username_text.text.toString()
-        //edittext's name can use directly....without findview by id
 
     }
 
