@@ -13,6 +13,7 @@ import com.mapbox.android.core.location.LocationEnginePriority
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
+import com.mapbox.geojson.FeatureCollection
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdate
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -49,21 +50,30 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         mapView.onCreate(savedInstanceState)
         //Is it appropriate to be here??? i mean you quit the app and you have to download it again i guess
         //to login in
+        val settings=getSharedPreferences(coinzFile,Context.MODE_PRIVATE)
+        var downloadCoin=settings.getString(currentDate(),"Unable to load coinz. Check your network connection.")
+        if(downloadCoin=="Unable to load coinz. Check your network connection.")
+        {
+            downloadMap.execute(currentUrl())//unable to load coinz:cannot
+        }
+
+        //downloadMap.execute(currentUrl())
 
         //if have user instance now, stop this intent, add a pending situation
         //startActivity(Intent(this@MainActivity,LogInActivity::class.java))
-        downloadMap.execute(currentUrl())
+
         mapView.getMapAsync{mapboxMap ->
             map=mapboxMap
             enableLocation()
             //if have files for today, do not need to store
-            storeCoinz(DownloadCompleteRunner.result)
-
-
+            if(downloadCoin=="Unable to load coinz. Check your network connection."){
+                storeCoinz(DownloadCompleteRunner.result)
+            }
+            downloadCoin=settings.getString(currentDate(),"")
+            parseGeoJson(downloadCoin)
         }
 
     }
-
 
 
     fun enableLocation(){
@@ -146,6 +156,10 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         editor.apply()
     }
 
+
+    fun parseGeoJson(data:String?){//may not be null
+
+    }
 
 
 
