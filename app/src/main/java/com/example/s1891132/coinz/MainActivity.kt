@@ -2,19 +2,29 @@ package com.example.s1891132.coinz
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
 import android.location.Location
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.support.v4.content.ContextCompat
 import android.util.Log
+import com.google.gson.JsonObject
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineListener
 import com.mapbox.android.core.location.LocationEnginePriority
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
+import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
+import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.annotations.Icon
+import com.mapbox.mapboxsdk.annotations.IconFactory
+import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdate
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -23,6 +33,9 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
+import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineListener{
 
@@ -158,6 +171,66 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
 
 
     fun parseGeoJson(data:String?){//may not be null
+        if(data==null)
+        {
+            Log.e("","no GeoJson information for the day")
+        }
+        else{
+            val featureCollection=FeatureCollection.fromJson(data)
+            val features:List<Feature>?=featureCollection.features()
+            if(features==null)
+            {
+                Log.e("","no GeoJson information for the day")
+            }
+            else{
+                for(fc in features)
+                {
+                    val point=fc.geometry()as Point
+                    val latlng=LatLng(point.latitude(),point.longitude())
+                    //Log.i("marker",long.toString())
+                    val curtype=fc.properties()!!.getAsJsonPrimitive("currency").toString()
+                    val id=fc.properties()!!.getAsJsonPrimitive("id").toString()//or int
+                    val curvalue=fc.properties()!!.getAsJsonPrimitive("value").toString()//or int
+                    val markersymbol=fc.properties()!!.getAsJsonPrimitive("marker-symbol").toString()//or int?
+                    val markercolor=fc.properties()!!.getAsJsonPrimitive("marker-color").toString()
+                    /*val icon=IconFactory.getInstance(this)
+                    val iconDrawable=ContextCompat.getDrawable(this,R.drawable.puper)*/
+
+                    map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng))
+                }
+            }
+
+
+
+            /*val source=GeoJsonSource("coinzsource",featureCollection)
+            map.addSource(source)
+            val markerLayer=SymbolLayer("mylayerid","mysourceid")
+            map.addLayer(markerLayer)*/
+
+
+            /*Bitmap icon = BitmapFactory.decodeResource(
+      BasicSymbolLayerActivity.this.getResources(), R.drawable.blue_marker_view);
+
+    // Add the marker image to map
+    mapboxMap.addImage("my-marker-image", icon);
+
+    SymbolLayer markers = new SymbolLayer("marker-layer", "marker-source")
+      .withProperties(PropertyFactory.iconImage("my-marker-image"));
+    mapboxMap.addLayer(markers);
+
+    // Add the selected marker source and layer
+    FeatureCollection emptySource = FeatureCollection.fromFeatures(new Feature[]{});
+    Source selectedMarkerSource = new GeoJsonSource("selected-marker", emptySource);
+    mapboxMap.addSource(selectedMarkerSource);
+
+    SymbolLayer selectedMarker = new SymbolLayer("selected-marker-layer", "selected-marker")
+      .withProperties(PropertyFactory.iconImage("my-marker-image"));
+    mapboxMap.addLayer(selectedMarker);
+
+mapboxMap.addOnMapClickListener(this);*/
+
+        }
+
 
     }
 
