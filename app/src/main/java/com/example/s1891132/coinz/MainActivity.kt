@@ -1,5 +1,6 @@
 package com.example.s1891132.coinz
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -11,6 +12,9 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.support.v4.content.ContextCompat
 import android.util.Log
+import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.IdpResponse
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.JsonObject
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineListener
@@ -35,7 +39,9 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
+import kotlinx.android.synthetic.main.activity_log_in.*
 import org.json.JSONObject
+import java.util.*
 
 class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineListener{
 
@@ -54,7 +60,6 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
     private var downloadMap: DownloadFileTask=DownloadFileTask(DownloadCompleteRunner)//is it possible to be null???
     private var coinzFile="CoinzGeoInfoToday"
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -63,6 +68,19 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         mapView.onCreate(savedInstanceState)
         //Is it appropriate to be here??? i mean you quit the app and you have to download it again i guess
         //to login in
+        // Choose authentication providers
+        val providers = arrayListOf(
+                AuthUI.IdpConfig.EmailBuilder().build())
+        // Create and launch sign-in intent
+        startActivityForResult(
+                AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setAvailableProviders(providers)
+                        .build(),
+                RC_SIGN_IN)
+
+        //can set theme and logo for log in ui in https://github.com/firebase/snippets-android/blob/027f11bd3c3ff625a20ee4a832a2768e0b0204e6/auth/app/src/main/java/com/google/firebase/quickstart/auth/kotlin/FirebaseUIActivity.kt#L40-L57
+
         val settings=getSharedPreferences(coinzFile,Context.MODE_PRIVATE)
         var downloadCoin=settings.getString(currentDate(),"Unable to load coinz. Check your network connection.")
         if(downloadCoin=="Unable to load coinz. Check your network connection.")
@@ -88,6 +106,28 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
 
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == RC_SIGN_IN) {
+            val response = IdpResponse.fromResultIntent(data)
+
+            if (resultCode == Activity.RESULT_OK) {
+                // Successfully signed in
+                val user = FirebaseAuth.getInstance().currentUser
+                //get current User here
+
+                // ...
+            }
+            /*else {
+                // Sign in failed. If response is null the user canceled the
+                // sign-in flow using the back button. Otherwise check
+                // response.getError().getErrorCode() and handle the error.
+                // ...
+            }*/
+        }
+    }
+
 
     fun enableLocation(){
         if(PermissionsManager.areLocationPermissionsGranted(this))
@@ -100,6 +140,8 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
 
         }
     }
+
+
 
     @SuppressWarnings("MissingPermission")
     private fun initializeLocationEngine(){
@@ -297,4 +339,12 @@ mapboxMap.addOnMapClickListener(this);*/
         super.onLowMemory()
         mapView.onLowMemory()
     }
+
+    companion object {
+        private const val RC_SIGN_IN = 123
+    }
 }
+
+
+
+
