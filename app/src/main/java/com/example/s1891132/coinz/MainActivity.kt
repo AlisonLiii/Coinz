@@ -12,6 +12,8 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.support.v4.content.ContextCompat
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
@@ -40,6 +42,9 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import kotlinx.android.synthetic.main.activity_log_in.*
+import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.appcompat.v7.toolbar
+import org.jetbrains.anko.longToast
 import org.json.JSONObject
 import java.util.*
 
@@ -63,6 +68,8 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setSupportActionBar(menu_toolbar)
+
         Mapbox.getInstance(applicationContext,getString(R.string.access_token))
         mapView=findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
@@ -128,6 +135,21 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu):Boolean{
+        menuInflater.inflate(R.menu.menu_toolbar,menu)
+        return true
+    }
+
+    //still under construction
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        AuthUI.getInstance()
+                .signOut(this)
+                .addOnCompleteListener {
+                    longToast("sign out successfully")
+                }
+        // [END auth_fui_signout]
+        return true
+    }
 
     fun enableLocation(){
         if(PermissionsManager.areLocationPermissionsGranted(this))
@@ -244,6 +266,10 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
 
 
 
+
+
+
+
             /*val source=GeoJsonSource("coinzsource",featureCollection)
             map.addSource(source)
             val markerLayer=SymbolLayer("mylayerid","mysourceid")
@@ -275,6 +301,7 @@ mapboxMap.addOnMapClickListener(this);*/
 
 
     }
+
 
 
 
