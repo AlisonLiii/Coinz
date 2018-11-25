@@ -3,6 +3,7 @@ package com.example.s1891132.coinz
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
@@ -17,6 +18,8 @@ import android.view.MenuItem
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.JsonObject
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineListener
@@ -30,12 +33,15 @@ import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
+import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
+import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdate
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
@@ -44,63 +50,56 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import kotlinx.android.synthetic.main.activity_log_in.*
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.appcompat.v7.toolbar
+import org.jetbrains.anko.db.NULL
+import org.jetbrains.anko.find
+import org.jetbrains.anko.locationManager
 import org.jetbrains.anko.longToast
 import org.json.JSONObject
 import java.util.*
+import kotlin.collections.HashMap
 
-class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineListener{
+class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineListener, OnMapReadyCallback,MapboxMap.OnMarkerClickListener {
 
 
     private val tag= "MainActivity"
-    //private var downloadDate=""//Format:YYYY/MM/DD
-    //private val preferencesFile="MarkersInfo"//for storing preferences
-
     private lateinit var mapView: MapView
     private lateinit var map: MapboxMap
     private lateinit var permissionsManager: PermissionsManager
     private lateinit var originLocation: Location
     private var locationEngine: LocationEngine?=null
     private var locationLayerPlugin: LocationLayerPlugin?=null
-
+    private lateinit var db:FirebaseFirestore
     private var downloadMap: DownloadFileTask=DownloadFileTask(DownloadCompleteRunner)//is it possible to be null???
     private var coinzFile="CoinzGeoInfoToday"
+    private lateinit var downloadCoin:String
+    private lateinit var settings:SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(menu_toolbar)
-
+        db=FirebaseFirestore.getInstance()
         Mapbox.getInstance(applicationContext,getString(R.string.access_token))
         mapView=findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
-        //Is it appropriate to be here??? i mean you quit the app and you have to download it again i guess
-        //to login in
-        // Choose authentication providers
         val providers = arrayListOf(
                 AuthUI.IdpConfig.EmailBuilder().build())
-        // Create and launch sign-in intent
-        startActivityForResult(
+        /*startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
                         .setAvailableProviders(providers)
                         .build(),
-                RC_SIGN_IN)
+                RC_SIGN_IN)*/
 
         //can set theme and logo for log in ui in https://github.com/firebase/snippets-android/blob/027f11bd3c3ff625a20ee4a832a2768e0b0204e6/auth/app/src/main/java/com/google/firebase/quickstart/auth/kotlin/FirebaseUIActivity.kt#L40-L57
 
-        val settings=getSharedPreferences(coinzFile,Context.MODE_PRIVATE)
-        var downloadCoin=settings.getString(currentDate(),"Unable to load coinz. Check your network connection.")
+        settings=getSharedPreferences(coinzFile,Context.MODE_PRIVATE)
+        downloadCoin=settings.getString(currentDate(),"Unable to load coinz. Check your network connection.")
         if(downloadCoin=="Unable to load coinz. Check your network connection.")
         {
             downloadMap.execute(currentUrl())//unable to load coinz:cannot
         }
-
-        //downloadMap.execute(currentUrl())
-
-        //if have user instance now, stop this intent, add a pending situation
-        //startActivity(Intent(this@MainActivity,LogInActivity::class.java))
-
-        mapView.getMapAsync{mapboxMap ->
+        /*mapView.getMapAsync{mapboxMap ->
             map=mapboxMap
             enableLocation()
             //if have files for today, do not need to store
@@ -109,11 +108,27 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
             }
             downloadCoin=settings.getString(currentDate(),"")
             parseGeoJson(downloadCoin)
-        }
+            val user = FirebaseAuth.getInstance().currentUser
+        }*/
+
+        mapView.getMapAsync(this)
 
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onMapReady(mapboxMap: MapboxMap?) {
+        map=mapboxMap!!
+        longToast("Please wait for a second to get your location")
+        enableLocation()
+        //if have files for today, do not need to store
+        if(downloadCoin=="Unable to load coinz. Check your network connection."){
+            storeCoinz(DownloadCompleteRunner.result)
+        }
+        downloadCoin=settings.getString(currentDate(),"")
+        parseGeoJson(downloadCoin)
+        val user = FirebaseAuth.getInstance().currentUser
+    }
+
+    /*override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == RC_SIGN_IN) {
@@ -121,9 +136,18 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
 
             if (resultCode == Activity.RESULT_OK) {
                 // Successfully signed in
-                val user = FirebaseAuth.getInstance().currentUser
-                //get current User here
+                longToast("Sign in successfully")
 
+                /*val items= HashMap<String,Any>()
+                items.put("name","jjjjj")
+                db.collection("AI").document(FirebaseAuth.getInstance().uid!!).set(items)
+                        .addOnSuccessListener {
+                            longToast("success")
+                        }
+                        .addOnFailureListener{
+                            longToast("Failure")
+                        }*/
+                //get current User here
                 // ...
             }
             /*else {
@@ -133,7 +157,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
                 // ...
             }*/
         }
-    }
+    }*/
 
     override fun onCreateOptionsMenu(menu: Menu):Boolean{
         menuInflater.inflate(R.menu.menu_toolbar,menu)
@@ -163,8 +187,6 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         }
     }
 
-
-
     @SuppressWarnings("MissingPermission")
     private fun initializeLocationEngine(){
         locationEngine=LocationEngineProvider(this).obtainBestLocationEngineAvailable()
@@ -176,7 +198,6 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         {
             originLocation=lastLocation
             setCameraPosition(lastLocation)
-
         }else{
             locationEngine?.addLocationEngineListener(this)
         }
@@ -196,6 +217,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude,location.longitude),15.0))
     }
 
+
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
         //Present a dialog explaining why they need to grant access
     }
@@ -214,16 +236,22 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
        location?.let {
            originLocation=location
            setCameraPosition(location)
-
        }
+        map.setOnMarkerClickListener(this)
     }
 
 @SuppressWarnings("MissingPermission")
     override fun onConnected() {
      locationEngine?.requestLocationUpdates()
+    }
 
-
-
+    override fun onMarkerClick(marker: Marker): Boolean {
+        if(marker.position.distanceTo(LatLng(originLocation.latitude,originLocation.longitude))<25)
+        {
+            longToast("success")
+        }
+        else longToast("fail")
+        return true
     }
 
 
@@ -264,12 +292,6 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
                 }
             }
 
-
-
-
-
-
-
             /*val source=GeoJsonSource("coinzsource",featureCollection)
             map.addSource(source)
             val markerLayer=SymbolLayer("mylayerid","mysourceid")
@@ -299,11 +321,7 @@ mapboxMap.addOnMapClickListener(this);*/
 
         }
 
-
     }
-
-
-
 
 
 
@@ -313,11 +331,19 @@ mapboxMap.addOnMapClickListener(this);*/
         if(PermissionsManager.areLocationPermissionsGranted(this)){
             locationEngine?.requestLocationUpdates()
             locationLayerPlugin?.onStart()
-            Log.i("maptest","here3")
-
-
         }
+        /*if (locationEngine != null) {
+
+            try {
+                locationEngine?.requestLocationUpdates()
+            } catch (ignored: SecurityException) {
+            }
+
+            locationEngine?.addLocationEngineListener(this)
+        }*/
         mapView.onStart()
+
+
         //val settings=getSharedPreferences(preferencesFile, Context.MODE_PRIVATE)//restore preferences
         //downloadDate=settings.getString("lastDownloadDate","")//use ""as default value(this might be the first time the app is run)
         //Log.d(tag,"[onStart] Recalled lastDownloadDate is '$downloadDate'")
@@ -371,6 +397,8 @@ mapboxMap.addOnMapClickListener(this);*/
         private const val RC_SIGN_IN = 123
     }
 }
+
+
 
 
 
