@@ -12,6 +12,7 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_log_in.*
 import org.jetbrains.anko.longToast
+import org.jetbrains.anko.toast
 
 
 class LogInActivity : AppCompatActivity() {
@@ -21,18 +22,13 @@ class LogInActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_log_in)
         mAuth= FirebaseAuth.getInstance()
-        //there's a bug here, the edit text is blank?
-
-       /* if(username_text.text.isBlank()||password_text.text.isBlank()){
-            signin.isClickable=false
-        }*/
-
-
-
         signin.setOnClickListener{
             val email=username_text.text.toString()
             val password=password_text.text.toString()
-
+            if(email.isEmpty()||password.isEmpty()) {
+                toast("Please enter text in email/password")
+                return@setOnClickListener
+            }
             mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, OnCompleteListener<AuthResult> { task ->
                 if (task.isSuccessful()) {
                     var intent = Intent(this, MainActivity::class.java)
