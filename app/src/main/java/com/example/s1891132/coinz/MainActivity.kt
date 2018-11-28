@@ -1,23 +1,33 @@
 package com.example.s1891132.coinz
 
 import android.app.Activity
+import android.support.v4.app.Fragment
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.location.Location
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.support.design.widget.NavigationView
+import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.GravityCompat
+import android.support.v7.app.ActionBarDrawerToggle
+import android.text.Layout
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import com.example.s1891132.coinz.R.menu.menu_toolbar
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.JsonObject
@@ -49,11 +59,11 @@ import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import kotlinx.android.synthetic.main.activity_log_in.*
 import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.*
 import org.jetbrains.anko.appcompat.v7.toolbar
 import org.jetbrains.anko.db.NULL
-import org.jetbrains.anko.find
-import org.jetbrains.anko.locationManager
-import org.jetbrains.anko.longToast
+import org.jetbrains.anko.design.longSnackbar
+import org.jetbrains.anko.design.snackbar
 import org.json.JSONObject
 import java.util.*
 import kotlin.collections.HashMap
@@ -73,11 +83,54 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
     private var coinzFile="CoinzGeoInfoToday"
     private lateinit var downloadCoin:String
     private lateinit var settings:SharedPreferences
+    private lateinit var user:FirebaseUser
+    private lateinit var drawerLayout: Layout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setSupportActionBar(menu_toolbar)
+        setSupportActionBar(toolbar)
+        val actionBar = supportActionBar
+        actionBar?.title = "Coinz"
+        // Initialize the action bar drawer toggle instance
+        val drawerToggle:ActionBarDrawerToggle = object : ActionBarDrawerToggle(
+                this,
+                drawer_layout,
+                toolbar,
+                R.string.drawer_open,
+                R.string.drawer_close
+        )
+        {
+
+        }
+        // Configure the drawer layout to add listener and show icon on toolbar
+        drawerToggle.isDrawerIndicatorEnabled = true
+        drawer_layout.addDrawerListener(drawerToggle)
+        drawerToggle.syncState()
+        // Set navigation view navigation item selected listener
+        navigation_view.setNavigationItemSelectedListener{
+            when (it.itemId){
+                R.id.my_account ->
+                {
+                    replaceFragment(MyAccountFragment())//TODO:WRONG HERE
+                }
+                R.id.people -> {
+                    //TODO: Show people fragment
+                }
+                R.id.action_paste -> toast("Paste clicked")
+                R.id.signout ->{
+                    AuthUI.getInstance()
+                            .signOut(this)
+                            .addOnCompleteListener {
+                                longToast("sign out successfully, now return to the log in page")
+                                startActivity<LogInActivity>()}
+                }
+            }
+            // Close the drawer
+            drawer_layout.closeDrawer(GravityCompat.START)
+            true
+        }
+
         db=FirebaseFirestore.getInstance()
         Mapbox.getInstance(applicationContext,getString(R.string.access_token))
         mapView=findViewById(R.id.mapView)
@@ -125,10 +178,10 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         }
         downloadCoin=settings.getString(currentDate(),"")
         parseGeoJson(downloadCoin)
-        val user = FirebaseAuth.getInstance().currentUser
+        user = FirebaseAuth.getInstance().currentUser!!
     }
 
-    /*override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == RC_SIGN_IN) {
@@ -157,7 +210,14 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
                 // ...
             }*/
         }
-    }*/
+    }
+
+    private fun replaceFragment(fragment: Fragment){//TODO:WRONG HERE
+        supportFragmentManager.beginTransaction().apply{
+            replace(R.id.fragment_frame,fragment)
+            commit()
+        }
+    }
 
     override fun onCreateOptionsMenu(menu: Menu):Boolean{
         menuInflater.inflate(R.menu.menu_toolbar,menu)
@@ -246,11 +306,32 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {
+        if(marker.isInfoWindowShown)
+        {
+            marker.hideInfoWindow()
+        }
+        else marker.showInfoWindow(map,mapView)
         if(marker.position.distanceTo(LatLng(originLocation.latitude,originLocation.longitude))<25)
         {
             longToast("success")
+
+            val items= HashMap<String,Any>()
+            items.put("SHIL",777)//will replace the value
+            //unresolved bug here
+            Log.i("this",marker.snippet)
+
+            db.collection("user wallet").document(user.uid).set(items)
+                    .addOnSuccessListener {
+                        longToast("success added")
+                    }
+                    .addOnFailureListener{
+                        longToast("Failure added")
+                    }
+
+
         }
         else longToast("fail")
+
         return true
     }
 
@@ -301,7 +382,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
             /*Bitmap icon = BitmapFactory.decodeResource(
       BasicSymbolLayerActivity.this.getResources(), R.drawable.blue_marker_view);
 
-    // Add the marker image to map
+    // Add the marker image to map.toDouble()
     mapboxMap.addImage("my-marker-image", icon);
 
     SymbolLayer markers = new SymbolLayer("marker-layer", "marker-source")

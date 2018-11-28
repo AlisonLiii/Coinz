@@ -35,10 +35,10 @@ class LogInActivity : AppCompatActivity() {
                     intent.putExtra("id", mAuth.currentUser?.email)//id or email address
                     startActivity(intent)//you cannot go back to mainActivity.....because you still need to login again.
                 } else {
-                    longToast("Invalid username or password, please try again")
+                    longToast("Invalid username or password, please try again. Make sure you have registered before.")
                 }
             })
-        }//here you should test what if invalid password?
+        }
        register.setOnClickListener {
             startActivity(Intent(this@LogInActivity,RegisterActivity::class.java))
         }

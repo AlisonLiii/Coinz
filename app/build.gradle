@@ -39,10 +39,14 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore:17.1.2'
     implementation 'com.google.firebase:firebase-auth:16.0.4'
     implementation 'com.google.firebase:firebase-core:16.0.4'
+    implementation 'com.firebaseui:firebase-ui-auth:4.1.0'
+    implementation 'com.firebaseui:firebase-ui-storage:3.2.2'
+    implementation 'com.google.firebase:firebase-storage:11.8.0'
+    implementation 'com.google.firebase:firebase-messaging:17.3.4'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation 'com.firebaseui:firebase-ui-auth:4.1.0'
 
     implementation 'com.google.android.gms:play-services-location:15.0.1'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.5.0'
@@ -50,12 +54,27 @@ dependencies {
     implementation "org.jetbrains.anko:anko:$anko_version"
     implementation "org.jetbrains.anko:anko-design:$anko_version"
     implementation "org.jetbrains.anko:anko-coroutines:$anko_version"
+    //implementation 'com.github.bumptech.glide:glide:4.6.1'
+    //annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
+    //glide
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
+    kapt 'com.github.bumptech.glide:compiler:4.8.0'
+    implementation 'de.hdodenhof:circleimageview:2.1.0'
 
-    kotlin{
-        experimental{
+    kotlin {
+        experimental {
             coroutines "enable"
         }
     }
+
+    androidExtensions {
+        experimental = true
+    }
+    apply plugin: 'com.google.gms.google-services'
+    apply plugin: 'kotlin-kapt'
+
 }
 
-apply plugin: 'com.google.gms.google-services'
+
+
+

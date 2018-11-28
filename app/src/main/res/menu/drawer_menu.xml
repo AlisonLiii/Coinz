@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+    <item
+        android:id="@+id/my_account"
+        android:title="My Account"
+        android:icon="@mipmap/my_account"
+
+        />
+    <item
+        android:id="@+id/people"
+        android:title="People"
+        android:icon="@mipmap/people"
+
+        />
+    <item
+        android:id="@+id/action_paste"
+        android:title="Paste"
+
+        />
+    <item
+        android:id="@+id/signout"
+        android:title="Sign out"
+
+        />
+</menu>
