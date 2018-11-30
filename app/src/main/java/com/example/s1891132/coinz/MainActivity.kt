@@ -70,21 +70,20 @@ import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineListener, OnMapReadyCallback,MapboxMap.OnMarkerClickListener {
 
-
-    private val tag= "MainActivity"
     private lateinit var mapView: MapView
     private lateinit var map: MapboxMap
     private lateinit var permissionsManager: PermissionsManager
     private lateinit var originLocation: Location
-    private var locationEngine: LocationEngine?=null
-    private var locationLayerPlugin: LocationLayerPlugin?=null
     private lateinit var db:FirebaseFirestore
-    private var downloadMap: DownloadFileTask=DownloadFileTask(DownloadCompleteRunner)//is it possible to be null???
-    private var coinzFile="CoinzGeoInfoToday"
     private lateinit var downloadCoin:String
     private lateinit var settings:SharedPreferences
     private lateinit var user:FirebaseUser
-    private lateinit var drawerLayout: Layout
+
+    private var coinList:MutableList<Coin> = ArrayList()
+    private var locationEngine: LocationEngine?=null
+    private var locationLayerPlugin: LocationLayerPlugin?=null
+    private var downloadMap: DownloadFileTask=DownloadFileTask(DownloadCompleteRunner)//is it possible to be null???
+    private var coinzFile="CoinzGeoInfoToday"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,12 +111,15 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
             when (it.itemId){
                 R.id.my_account ->
                 {
-                    replaceFragment(MyAccountFragment())//TODO:WRONG HERE
+                    replaceFragment(MyAccountFragment())//TODO:ID LAYOUT
                 }
                 R.id.people -> {
                     //TODO: Show people fragment
                 }
-                R.id.action_paste -> toast("Paste clicked")
+                R.id.my_property ->
+                {
+                    replaceFragment(MyPropertyFragment())
+                }
                 R.id.signout ->{
                     AuthUI.getInstance()
                             .signOut(this)
@@ -135,42 +137,27 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         Mapbox.getInstance(applicationContext,getString(R.string.access_token))
         mapView=findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
-        val providers = arrayListOf(
-                AuthUI.IdpConfig.EmailBuilder().build())
-        /*startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .build(),
-                RC_SIGN_IN)*/
-
-        //can set theme and logo for log in ui in https://github.com/firebase/snippets-android/blob/027f11bd3c3ff625a20ee4a832a2768e0b0204e6/auth/app/src/main/java/com/google/firebase/quickstart/auth/kotlin/FirebaseUIActivity.kt#L40-L57
-
         settings=getSharedPreferences(coinzFile,Context.MODE_PRIVATE)
         downloadCoin=settings.getString(currentDate(),"Unable to load coinz. Check your network connection.")
         if(downloadCoin=="Unable to load coinz. Check your network connection.")
         {
             downloadMap.execute(currentUrl())//unable to load coinz:cannot
         }
-        /*mapView.getMapAsync{mapboxMap ->
-            map=mapboxMap
-            enableLocation()
-            //if have files for today, do not need to store
-            if(downloadCoin=="Unable to load coinz. Check your network connection."){
-                storeCoinz(DownloadCompleteRunner.result)
-            }
-            downloadCoin=settings.getString(currentDate(),"")
-            parseGeoJson(downloadCoin)
-            val user = FirebaseAuth.getInstance().currentUser
-        }*/
-
         mapView.getMapAsync(this)
 
     }
 
     override fun onMapReady(mapboxMap: MapboxMap?) {
         map=mapboxMap!!
-        longToast("Please wait for a second to get your location")
+        //val view=this.findViewById<View>(android.R.id.content)
+        //view.longSnackbar("Please wait for some seconds to get your location","OK")
+        {}
+        val dialog=indeterminateProgressDialog(message = "Please wait a bit", title="Getting your location")
+        {
+
+        }
+
+        //longToast("Please wait for a second to get your location")
         enableLocation()
         //if have files for today, do not need to store
         if(downloadCoin=="Unable to load coinz. Check your network connection."){
@@ -181,40 +168,11 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         user = FirebaseAuth.getInstance().currentUser!!
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == RC_SIGN_IN) {
-            val response = IdpResponse.fromResultIntent(data)
-
-            if (resultCode == Activity.RESULT_OK) {
-                // Successfully signed in
-                longToast("Sign in successfully")
-
-                /*val items= HashMap<String,Any>()
-                items.put("name","jjjjj")
-                db.collection("AI").document(FirebaseAuth.getInstance().uid!!).set(items)
-                        .addOnSuccessListener {
-                            longToast("success")
-                        }
-                        .addOnFailureListener{
-                            longToast("Failure")
-                        }*/
-                //get current User here
-                // ...
-            }
-            /*else {
-                // Sign in failed. If response is null the user canceled the
-                // sign-in flow using the back button. Otherwise check
-                // response.getError().getErrorCode() and handle the error.
-                // ...
-            }*/
-        }
-    }
-
-    private fun replaceFragment(fragment: Fragment){//TODO:WRONG HERE
+    private fun replaceFragment(fragment: Fragment){
         supportFragmentManager.beginTransaction().apply{
             replace(R.id.fragment_frame,fragment)
+            addToBackStack(null)// press the Back on the phone and return to the main screen
             commit()
         }
     }
@@ -296,7 +254,11 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
        location?.let {
            originLocation=location
            setCameraPosition(location)
+           /*val intent=Intent("LocationChanged")
+           intent.setType("text/plain")
+           sendBroadcast(intent);*/
        }
+
         map.setOnMarkerClickListener(this)
     }
 
@@ -313,10 +275,26 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         else marker.showInfoWindow(map,mapView)
         if(marker.position.distanceTo(LatLng(originLocation.latitude,originLocation.longitude))<25)
         {
+            coinList.forEach {
+                if(it.latlng==marker.position)
+                {
+                    if(it.type.equals("PENY",true))
+                        FirestoreUtil.updateWalletBalance(it.value,0.0,0.0,0.0,1)
+                    else if(it.type.equals("DOLR",true))
+                        FirestoreUtil.updateWalletBalance(0.0,it.value,0.0,0.0,1)
+                    else if(it.type.equals("SHIL",true))
+                        FirestoreUtil.updateWalletBalance(0.0,0.0,it.value,0.0,1)
+                    else if(it.type.equals("QUID",true))
+                        FirestoreUtil.updateWalletBalance(0.0,0.0,0.0,0.0,1)
+                    else
+                        Log.d("coinz","Invalid type of coinz")
+                }
+            }
             longToast("success")
-
-            val items= HashMap<String,Any>()
-            items.put("SHIL",777)//will replace the value
+            //TODO:COINLIST STORE in firebase
+            marker.remove()
+            /*val items= HashMap<String,Any>()
+            items.put("SHIL",777)
             //unresolved bug here
             Log.i("this",marker.snippet)
 
@@ -326,9 +304,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
                     }
                     .addOnFailureListener{
                         longToast("Failure added")
-                    }
-
-
+                    }*/
         }
         else longToast("fail")
 
@@ -361,14 +337,15 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
                     val point=fc.geometry()as Point
                     val latlng=LatLng(point.latitude(),point.longitude())
                     //Log.i("marker",long.toString())
-                    val curtype=fc.properties()!!.getAsJsonPrimitive("currency").toString()
-                    val id=fc.properties()!!.getAsJsonPrimitive("id").toString()//or int
-                    val curvalue=fc.properties()!!.getAsJsonPrimitive("value").toString()//or int
+                    val curtype=fc.properties()!!.getAsJsonPrimitive("currency").toString().replace("\"", "")
+                    val id=fc.properties()!!.getAsJsonPrimitive("id").toString().replace("\"", "")//or int
+                    val curvalue=fc.properties()!!.getAsJsonPrimitive("value").toString().replace("\"", "");//or int
                     val markersymbol=fc.properties()!!.getAsJsonPrimitive("marker-symbol").toString()//or int?
                     val markercolor=fc.properties()!!.getAsJsonPrimitive("marker-color").toString()
                     /*val icon=IconFactory.getInstance(this)
                     val iconDrawable=ContextCompat.getDrawable(this,R.drawable.puper)*/
-
+                    val coin=Coin(id,curtype,curvalue.toDouble(),latlng)
+                    coinList.add(coin)//TODO:is here wrong?
                     map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng))
                 }
             }
@@ -399,7 +376,6 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
     mapboxMap.addLayer(selectedMarker);
 
 mapboxMap.addOnMapClickListener(this);*/
-
         }
 
     }

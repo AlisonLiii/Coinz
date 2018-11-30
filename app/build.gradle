@@ -52,6 +52,7 @@ dependencies {
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.5.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.5.2'
     implementation "org.jetbrains.anko:anko:$anko_version"
+    implementation "org.jetbrains.anko:anko-commons:$anko_version"
     implementation "org.jetbrains.anko:anko-design:$anko_version"
     implementation "org.jetbrains.anko:anko-coroutines:$anko_version"
     //implementation 'com.github.bumptech.glide:glide:4.6.1'
@@ -59,7 +60,7 @@ dependencies {
     //glide
     implementation 'com.github.bumptech.glide:glide:4.8.0'
     kapt 'com.github.bumptech.glide:compiler:4.8.0'
-    implementation 'de.hdodenhof:circleimageview:2.1.0'
+    //implementation 'de.hdodenhof:circleimageview:2.1.0'
 
     kotlin {
         experimental {
@@ -74,7 +75,3 @@ dependencies {
     apply plugin: 'kotlin-kapt'
 
 }
-
-
-
-

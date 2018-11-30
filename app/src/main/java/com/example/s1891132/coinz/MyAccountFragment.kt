@@ -26,7 +26,7 @@ class MyAccountFragment : Fragment() {
         view.apply {
 
             save_account_info.setOnClickListener{
-                FirestoreUtil.updateCurrentUser(edit_name.text.toString(),"","",
+                FirestoreUtil.updateCurrentUserProfile(edit_name.text.toString(),"","",
                                 edit_bio.text.toString(),2)
                 longToast("Changes saved")
             }
