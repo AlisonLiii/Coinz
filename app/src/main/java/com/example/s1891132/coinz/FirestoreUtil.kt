@@ -8,6 +8,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
+import com.xwray.groupie.kotlinandroidextensions.Item
 import org.jetbrains.anko.longToast
 
 /*
@@ -188,4 +190,25 @@ object FirestoreUtil {
                     onComplete(it.toObject(CoinzUser::class.java)!!)//TODO:NO "!!" HERE IN THE VIDEO
                 }
     }
+
+    fun addUsersListener(context: Context,onListen:(List<Item>)->Unit):ListenerRegistration{
+        return firestoreInstance.collection("users")
+                .addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+                    if (firebaseFirestoreException!=null)
+                    {
+                        Log.e("Firestore","Users listener error.",firebaseFirestoreException)
+                        return@addSnapshotListener
+                    }
+                    val items= mutableListOf<Item>()
+                    querySnapshot!!.documents.forEach {
+                        if(it.id!=FirebaseAuth.getInstance().currentUser?.uid)
+                            items.add(PersonItem(it.toObject(CoinzUser::class.java)!!,context))
+                    }
+                    onListen(items)
+
+                }
+    }
+
+    fun removeListener(registration: ListenerRegistration)=registration.remove()
+
 }

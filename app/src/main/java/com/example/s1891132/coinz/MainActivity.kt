@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
                     replaceFragment(MyAccountFragment())//TODO:ID LAYOUT
                 }
                 R.id.people -> {
-                    //TODO: Show people fragment
+                    replaceFragment(PeopleFragment())
                 }
                 R.id.my_property ->
                 {
