@@ -69,7 +69,7 @@ import java.util.*
 import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineListener, OnMapReadyCallback,MapboxMap.OnMarkerClickListener {
-
+    //TODO:DELETE TOOLBAR
     private lateinit var mapView: MapView
     private lateinit var map: MapboxMap
     private lateinit var permissionsManager: PermissionsManager

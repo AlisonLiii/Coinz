@@ -4,6 +4,9 @@ import android.content.Context
 import android.support.design.widget.Snackbar
 import android.util.Log
 import android.widget.Toast
+import com.example.s1891132.coinz.message.ChatChannel
+import com.example.s1891132.coinz.message.TextMessage
+import com.example.s1891132.coinz.message.TextMessageItem
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
@@ -27,6 +30,7 @@ object FirestoreUtil {
    val coinListRef: CollectionReference
         get()= currentUserDocRef.collection("coinListForTheDay")
 
+    private val chatChannelsCollectionRef = firestoreInstance.collection("chatChannels")
     //Initialise the user profile in Firestore when he/she first sign in;
     // if he/she has signed in before on another device, this method would not call
     fun initCurrentUserIfFirstTime(name:String,camp:Int, onComplete: () -> Unit) {
@@ -210,5 +214,56 @@ object FirestoreUtil {
     }
 
     fun removeListener(registration: ListenerRegistration)=registration.remove()
+
+    fun getOrCreateChatChannel(otherUserId: String,
+                               onComplete: (channelId: String) -> Unit) {
+        currentUserDocRef.collection("engagedChatChannels")
+                .document(otherUserId).get().addOnSuccessListener {
+                    if (it.exists()) {
+                        onComplete(it["channelId"] as String)
+                        return@addOnSuccessListener
+                    }
+
+                    val currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
+
+                    val newChannel = chatChannelsCollectionRef.document()
+                    newChannel.set(ChatChannel(mutableListOf(currentUserId, otherUserId)))
+
+                    currentUserDocRef
+                            .collection("engagedChatChannels")
+                            .document(otherUserId)
+                            .set(mapOf("channelId" to newChannel.id))
+
+                    firestoreInstance.collection("users").document(otherUserId)
+                            .collection("engagedChatChannels")
+                            .document(currentUserId)
+                            .set(mapOf("channelId" to newChannel.id))
+
+                    onComplete(newChannel.id)
+                }
+    }
+
+    fun addChatMessagesListener(channelId: String, context: Context,
+                                onListen: (List<Item>) -> Unit): ListenerRegistration {
+        return chatChannelsCollectionRef.document(channelId).collection("messages")
+                .orderBy("time")
+                .addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+                    if (firebaseFirestoreException != null) {
+                        Log.e("FIRESTORE", "ChatMessagesListener error.", firebaseFirestoreException)
+                        return@addSnapshotListener
+                    }
+
+                    val items = mutableListOf<Item>()
+                    querySnapshot!!.documents.forEach {
+                        items.add(TextMessageItem(it.toObject(TextMessage::class.java)!!, context))
+                        return@forEach
+                    }
+                    onListen(items)
+                }
+    }
+
+    fun sendMessage(message: TextMessage,channelId: String){
+        chatChannelsCollectionRef.document(channelId).collection("messages").add(message)
+    }
 
 }

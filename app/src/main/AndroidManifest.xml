@@ -27,7 +27,12 @@
         <activity android:name=".MainActivity" />
         <activity
             android:name=".BankCoinzActivity"
-            android:label="@string/title_activity_bank_coinz"></activity>
+            android:label="@string/title_activity_bank_coinz" />
+        <activity android:name=".ChatActivity">
+            <meta-data
+                android:name="android:support.PARENT_ACTIVITY"
+                android:value=".MainActivity"/>
+        </activity>
     </application>
 
 </manifest>
