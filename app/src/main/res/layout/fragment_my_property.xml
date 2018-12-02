@@ -94,6 +94,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+
+        <Button
+            android:layout_marginTop="10dp"
+            android:id="@+id/put_coin_in_bank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_orange_light"
+            android:layout_gravity="center"
+            android:text="@string/coin_in_bank"
+            android:textAllCaps="false"/>
+
     </LinearLayout>
 
 

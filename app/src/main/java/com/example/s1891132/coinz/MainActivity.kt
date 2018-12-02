@@ -143,6 +143,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         {
             downloadMap.execute(currentUrl())//unable to load coinz:cannot
         }
+        FirestoreUtil.newDayUpdateOrNot()
         mapView.getMapAsync(this)
 
     }
@@ -285,9 +286,11 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
                     else if(it.type.equals("SHIL",true))
                         FirestoreUtil.updateWalletBalance(0.0,0.0,it.value,0.0,1)
                     else if(it.type.equals("QUID",true))
-                        FirestoreUtil.updateWalletBalance(0.0,0.0,0.0,0.0,1)
+                        FirestoreUtil.updateWalletBalance(0.0,0.0,0.0,it.value,1)
                     else
                         Log.d("coinz","Invalid type of coinz")
+
+                    FirestoreUtil.addCoinInList(it)
                 }
             }
             longToast("success")
@@ -325,7 +328,11 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
             Log.e("","no GeoJson information for the day")
         }
         else{
+
+
+
             val featureCollection=FeatureCollection.fromJson(data)
+
             val features:List<Feature>?=featureCollection.features()
             if(features==null)
             {
@@ -345,8 +352,14 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
                     /*val icon=IconFactory.getInstance(this)
                     val iconDrawable=ContextCompat.getDrawable(this,R.drawable.puper)*/
                     val coin=Coin(id,curtype,curvalue.toDouble(),latlng)
-                    coinList.add(coin)//TODO:is here wrong?
-                    map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng))
+                    FirestoreUtil.coinListRef.document(id).get().addOnSuccessListener { documentSnapshot ->
+                            if(!documentSnapshot.exists())
+                            {
+                                coinList.add(coin)//TODO:is here wrong?
+                                map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng))
+                            }
+                        }
+
                 }
             }
 

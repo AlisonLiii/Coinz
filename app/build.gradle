@@ -61,6 +61,9 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.8.0'
     kapt 'com.github.bumptech.glide:compiler:4.8.0'
     //implementation 'de.hdodenhof:circleimageview:2.1.0'
+    //groupie
+    implementation 'com.xwray:groupie:2.0.3'
+    implementation 'com.xwray:groupie-kotlin-android-extensions:2.0.3'
 
     kotlin {
         experimental {

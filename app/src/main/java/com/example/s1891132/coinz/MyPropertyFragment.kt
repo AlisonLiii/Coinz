@@ -1,19 +1,29 @@
 package com.example.s1891132.coinz
 
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import kotlinx.android.synthetic.main.fragment_my_property.*
+import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.support.v4.longToast
 
 
-class MyPropertyFragment : Fragment() {
+class MyPropertyFragment : Fragment() {//TODO:CLASH WIT
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_my_property, container, false)
+        val coin_button=view.findViewById<Button>(R.id.put_coin_in_bank) as Button
+        coin_button.setOnClickListener {
+            val intent=Intent(context,BankCoinzActivity::class.java)
+            context?.startActivity(intent)
+        }
         return view
     }
 
