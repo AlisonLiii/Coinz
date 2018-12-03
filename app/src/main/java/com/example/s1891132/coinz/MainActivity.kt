@@ -64,6 +64,7 @@ import org.jetbrains.anko.appcompat.v7.toolbar
 import org.jetbrains.anko.db.NULL
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
+import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
 import kotlin.collections.HashMap
@@ -330,7 +331,6 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         else{
 
 
-
             val featureCollection=FeatureCollection.fromJson(data)
 
             val features:List<Feature>?=featureCollection.features()
@@ -341,6 +341,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
             else{
                 for(fc in features)
                 {
+
                     val point=fc.geometry()as Point
                     val latlng=LatLng(point.latitude(),point.longitude())
                     //Log.i("marker",long.toString())

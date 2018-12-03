@@ -17,24 +17,30 @@
         android:elevation="4dp"
         android:fitsSystemWindows="true" />
 
-    <TextView
-        android:layout_marginTop="?android:attr/actionBarSize"
-        app:layout_constraintTop_toTopOf="parent"
+        <TextView
+            android:layout_marginTop="?android:attr/actionBarSize"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="cursive"
+            android:id="@+id/hint_bank"
+            android:textSize="20sp"
+            android:text="Click something to operate"
+            android:textAlignment="center" />
+        <ListView
+            android:layout_marginTop="?android:attr/actionBarSize"
+            android:id="@+id/coin_list_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    <FrameLayout
+        android:id="@+id/fragment_frame_bank"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="cursive"
-        android:text="Click something to operate"
-        android:textAlignment="center" />
-    <ListView
-        android:layout_marginTop="?android:attr/actionBarSize"
-        android:id="@+id/coin_list_view"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        android:layout_height="match_parent">
+    </FrameLayout>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"

@@ -181,6 +181,10 @@ object FirestoreUtil {
                         coinListRef.document(document.id).delete()
                     }
                 }
+                val userFileMap= mutableMapOf<String,Any>()
+                userFileMap["date"]= currentDate()
+                userFileMap["bankNum"]= 0.0
+                currentUserDocRef.update(userFileMap)
             }
         }
     }

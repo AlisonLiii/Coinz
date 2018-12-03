@@ -15,4 +15,6 @@
     <string name="title_activity_bank_coinz">BankCoinzActivity</string>
     <string name="icon_put_in_account">Bank in</string>
     <string name="input_email_frend">Input the email of your friend</string>
+    <string name="today_rate">Rate of the day</string>
+    <string name="convert_to_gold">Exchange gold!</string>
 </resources>
