@@ -36,7 +36,7 @@ object FirestoreUtil {
     fun initCurrentUserIfFirstTime(name:String,camp:Int, onComplete: () -> Unit) {
         currentUserDocRef.get().addOnSuccessListener { documentSnapshot ->
             if (!documentSnapshot.exists()) {//Create user profile if the user's profile doesn't exist before
-                val newUser = CoinzUser(name, FirebaseAuth.getInstance().currentUser!!.uid , FirebaseAuth.getInstance().currentUser!!.email!!, "", camp,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0, currentDate())//TODO:maybe a null-safety problem here
+                val newUser = CoinzUser(name, FirebaseAuth.getInstance().currentUser!!.uid , FirebaseAuth.getInstance().currentUser!!.email!!, "", camp,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0, currentDate(),0.0)//TODO:maybe a null-safety problem here
                 currentUserDocRef.set(newUser).addOnSuccessListener {
                     onComplete()
                 }
@@ -60,6 +60,12 @@ object FirestoreUtil {
     fun deleteCoinInList(listWithCoins:CollectionReference,id: String){
         listWithCoins.document(id).delete()
 
+    }
+
+    fun updateWalkingDistance(walkingDistance:Double){
+        val userFileMap= mutableMapOf<String,Any>()
+        userFileMap["walkingDistance"]=walkingDistance
+        currentUserDocRef.update(userFileMap)
     }
 
     fun updateCurrentUserProfile(name:String="",id:String="",email:String="",bio:String="",camp:Int=2)
@@ -176,6 +182,7 @@ object FirestoreUtil {
             if(CoinzUser.date!= currentDate())
             {
                 updateWalletBalance(0.0,0.0,0.0,0.0,0)
+
                 coinListRef.get().addOnSuccessListener{documents->
                     for(document in documents){
                         coinListRef.document(document.id).delete()
@@ -184,6 +191,7 @@ object FirestoreUtil {
                 val userFileMap= mutableMapOf<String,Any>()
                 userFileMap["date"]= currentDate()
                 userFileMap["bankNum"]= 0.0
+                userFileMap["walkingDistance"]=0.0
                 currentUserDocRef.update(userFileMap)
             }
         }

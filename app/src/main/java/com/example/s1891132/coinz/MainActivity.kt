@@ -79,6 +79,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
     private lateinit var downloadCoin:String
     private lateinit var settings:SharedPreferences
     private lateinit var user:FirebaseUser
+    private var walkingDistance:Double=0.0
 
     private var coinList:MutableList<Coin> = ArrayList()
     private var locationEngine: LocationEngine?=null
@@ -254,7 +255,13 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
 
     override fun onLocationChanged(location: Location?) {
        location?.let {
+           if(::originLocation.isInitialized)
+           {
+               walkingDistance+=originLocation.distanceTo(location).toDouble()
+           }
            originLocation=location
+           FirestoreUtil.updateWalkingDistance(walkingDistance)
+           Log.i("walking",walkingDistance.toString())
            setCameraPosition(location)
            /*val intent=Intent("LocationChanged")
            intent.setType("text/plain")

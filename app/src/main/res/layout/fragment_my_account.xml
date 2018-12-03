@@ -57,6 +57,13 @@
             android:layout_height="wrap_content"
             android:drawableLeft="@drawable/ic_people_outline_black_24dp" />
 
+        <TextView
+            android:layout_marginTop="10dp"
+            android:id="@+id/walking_distance_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_directions_walk_black_24dp" />
+
 
         <Button
             android:layout_marginTop="20dp"
