@@ -1,9 +1,11 @@
 package com.example.s1891132.coinz
 
 import android.content.Context
-import android.support.design.widget.Snackbar
 import android.util.Log
-import android.widget.Toast
+import android.view.View
+import com.example.s1891132.coinz.ClassAndItem.Coin
+import com.example.s1891132.coinz.ClassAndItem.CoinzUser
+import com.example.s1891132.coinz.ClassAndItem.PersonItem
 import com.example.s1891132.coinz.message.ChatChannel
 import com.example.s1891132.coinz.message.TextMessage
 import com.example.s1891132.coinz.message.TextMessageItem
@@ -13,7 +15,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.xwray.groupie.kotlinandroidextensions.Item
-import org.jetbrains.anko.longToast
+import org.jetbrains.anko.design.snackbar
 
 /*
  * Acknowledgment:Codes adapted from Firebase Firestore Chat App: User Profile (Ep 2) - Kotlin Android Tutorial
@@ -27,8 +29,13 @@ object FirestoreUtil {
     val currentUserDocRef: DocumentReference
         get() = firestoreInstance.document("users/${FirebaseAuth.getInstance().uid //identify each single user by uid allocated by firebase authentication
                 ?: throw NullPointerException("UID is null")}")//If user not sign in, it's gonna be NULL
-   val coinListRef: CollectionReference
+    val coinListRef: CollectionReference
         get()= currentUserDocRef.collection("coinListForTheDay")
+    val coinFromOthersRef: CollectionReference
+        get()= currentUserDocRef.collection("coinFromOthers")
+    val markerRef: CollectionReference
+        get()= currentUserDocRef.collection("markerForTheDay")
+
 
     private val chatChannelsCollectionRef = firestoreInstance.collection("chatChannels")
     //Initialise the user profile in Firestore when he/she first sign in;
@@ -36,7 +43,7 @@ object FirestoreUtil {
     fun initCurrentUserIfFirstTime(name:String,camp:Int, onComplete: () -> Unit) {
         currentUserDocRef.get().addOnSuccessListener { documentSnapshot ->
             if (!documentSnapshot.exists()) {//Create user profile if the user's profile doesn't exist before
-                val newUser = CoinzUser(name, FirebaseAuth.getInstance().currentUser!!.uid , FirebaseAuth.getInstance().currentUser!!.email!!, "", camp,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0, currentDate(),0.0)//TODO:maybe a null-safety problem here
+                val newUser = CoinzUser(name, FirebaseAuth.getInstance().currentUser!!.uid, FirebaseAuth.getInstance().currentUser!!.email!!, "", camp, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, currentDate(), 0.0)//TODO:maybe a null-safety problem here
                 currentUserDocRef.set(newUser).addOnSuccessListener {
                     onComplete()
                 }
@@ -62,6 +69,64 @@ object FirestoreUtil {
 
     }
 
+    fun convertToGold(type:String,rate:Double){
+        currentUserDocRef.get().addOnSuccessListener { document ->
+            if (document != null) {
+                var moneyToConvert = 0.0
+                if(type.equals("SHIL",true))
+                    moneyToConvert=document["accountShil"] as Double
+                else if (type.equals("PENY",true))
+                    moneyToConvert = document["accountPeny"] as Double
+                else if (type.equals("DOLR",true))
+                    moneyToConvert = document["accountDolr"] as Double
+                else
+                    moneyToConvert = document["accountQuid"] as Double
+                val originGold=document["accountGold"] as Double
+                val accountGoldMap = mutableMapOf<String, Any>()
+                accountGoldMap["accountGold"]=moneyToConvert*rate+originGold as Double
+                currentUserDocRef.update(accountGoldMap)
+
+                }
+            }
+        }
+
+
+    fun shareCoinz(view: View, otherID:String, coin: Coin){
+        val otherUserDocRef= firestoreInstance.collection("users").document(otherID)
+        val otherUserCollRef= otherUserDocRef.collection("coinFromOthers")
+        val doc=otherUserCollRef.document(coin.id)
+        otherUserCollRef.document(coin.id).collection("users").document(otherID)
+                .get().addOnSuccessListener { documentSnapshot ->
+            if(!documentSnapshot.exists()) {
+                otherUserCollRef.document(coin.id).set(coin)
+            }
+            else {
+                snackbar(view,"Sent fail.Others already have this coin from other friends! Tell him to bank that coin into account first, and you can resend the coin")
+            }
+        }
+        deleteCoinInList(FirestoreUtil.coinListRef,coin.id)
+        if(coin.type.equals("PENY",true))
+        {
+            updateWalletBalance(currentUserDocRef,coin.value,0.0,0.0,0.0,-1)
+            updateWalletBalance(otherUserDocRef,coin.value,0.0,0.0,0.0,1)
+        }
+        else if(coin.type.equals("DOLR",true))
+        {
+            updateWalletBalance(currentUserDocRef,0.0,coin.value,0.0,0.0,-1)
+            updateWalletBalance(otherUserDocRef,0.0,coin.value,0.0,0.0,1)
+        }
+        else if(coin.type.equals("SHIL",true))
+        {
+            updateWalletBalance(currentUserDocRef,0.0,0.0,coin.value,0.0,-1)
+            updateWalletBalance(otherUserDocRef,0.0,0.0,coin.value,0.0,1)
+        }
+        else
+        {
+            updateWalletBalance(currentUserDocRef,0.0,0.0,0.0,coin.value,-1)
+            updateWalletBalance(otherUserDocRef,0.0,0.0,0.0,coin.value,1)
+        }
+    }
+
     fun updateWalkingDistance(walkingDistance:Double){
         val userFileMap= mutableMapOf<String,Any>()
         userFileMap["walkingDistance"]=walkingDistance
@@ -76,9 +141,9 @@ object FirestoreUtil {
         currentUserDocRef.update(userFiledMap)
     }
 
-    fun updateWalletBalance(peny:Double=0.0,dolr:Double=0.0,shil:Double=0.0,quid:Double=0.0,operation:Int)
+    fun updateWalletBalance(documentReference: DocumentReference,peny:Double=0.0,dolr:Double=0.0,shil:Double=0.0,quid:Double=0.0,operation:Int)
     {
-        currentUserDocRef.get().addOnSuccessListener { document ->
+        documentReference.get().addOnSuccessListener { document ->
             if(document!=null)
             {
                 val originPeny=document["walletPeny"] as Double
@@ -93,7 +158,7 @@ object FirestoreUtil {
                     if(dolr!=0.0) walletFileMap["walletDolr"]=originDolr+dolr
                     if(shil!=0.0) walletFileMap["walletShil"]=originShil+shil
                     if(quid!=0.0) walletFileMap["walletQuid"]=originQuid+quid
-                    currentUserDocRef.update(walletFileMap)
+                    documentReference.update(walletFileMap)
                 }
                 else if(operation==-1)//minus
                 {
@@ -101,7 +166,7 @@ object FirestoreUtil {
                     if(dolr!=0.0) walletFileMap["walletDolr"]=originDolr-dolr
                     if(shil!=0.0) walletFileMap["walletShil"]=originShil-shil
                     if(quid!=0.0) walletFileMap["walletQuid"]=originQuid-quid
-                    currentUserDocRef.update(walletFileMap)
+                    documentReference.update(walletFileMap)
                 }
                 else if(operation==0)//zero out
                 {
@@ -109,7 +174,7 @@ object FirestoreUtil {
                     walletFileMap["walletDolr"]=0.0
                     walletFileMap["walletShil"]=0.0
                     walletFileMap["walletQuid"]=0.0
-                    currentUserDocRef.update(walletFileMap)
+                    documentReference.update(walletFileMap)
                 }
                 else
                     Log.d("updateWallet","No such operations")
@@ -163,11 +228,11 @@ object FirestoreUtil {
         }
     }
 
-    fun addCoinInList(coin:Coin)
+    fun addCoinInList(collectionReference: CollectionReference,coin: Coin)
     {
-        coinListRef.document(coin.id).get().addOnSuccessListener { documentSnapshot ->
+        collectionReference.document(coin.id).get().addOnSuccessListener { documentSnapshot ->
             if(!documentSnapshot.exists()) {
-                coinListRef.document(coin.id).set(coin)
+                collectionReference.document(coin.id).set(coin)
             }
             else {
                 //TODO:cannot collect the coin
@@ -176,12 +241,14 @@ object FirestoreUtil {
     }
 
 
+
+
     fun newDayUpdateOrNot()
     {
         getCurrentUser { CoinzUser ->
             if(CoinzUser.date!= currentDate())
             {
-                updateWalletBalance(0.0,0.0,0.0,0.0,0)
+                updateWalletBalance(currentUserDocRef,0.0,0.0,0.0,0.0,0)
 
                 coinListRef.get().addOnSuccessListener{documents->
                     for(document in documents){
@@ -218,7 +285,7 @@ object FirestoreUtil {
                     val items= mutableListOf<Item>()
                     querySnapshot!!.documents.forEach {
                         if(it.id!=FirebaseAuth.getInstance().currentUser?.uid)
-                            items.add(PersonItem(it.toObject(CoinzUser::class.java)!!,context))
+                            items.add(PersonItem(it.toObject(CoinzUser::class.java)!!, context))
                     }
                     onListen(items)
 

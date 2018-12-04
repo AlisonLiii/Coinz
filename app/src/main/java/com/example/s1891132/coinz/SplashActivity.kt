@@ -2,7 +2,7 @@ package com.example.s1891132.coinz
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import com.example.s1891132.coinz.Authentication.LogInActivity
 import com.google.firebase.auth.FirebaseAuth
 import org.jetbrains.anko.startActivity
 

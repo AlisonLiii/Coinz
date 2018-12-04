@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.s1891132.coinz.ClassAndItem.PersonItem
 import com.example.s1891132.coinz.message.AppConstants
 import com.google.firebase.firestore.ListenerRegistration
 import com.xwray.groupie.GroupAdapter

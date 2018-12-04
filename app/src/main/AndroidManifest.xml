@@ -22,8 +22,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LogInActivity" />
-        <activity android:name=".RegisterActivity" />
+        <activity android:name=".Authentication.LogInActivity" />
+        <activity android:name=".Authentication.RegisterActivity" />
         <activity android:name=".MainActivity" />
         <activity
             android:name=".BankCoinzActivity"
@@ -31,8 +31,9 @@
         <activity android:name=".ChatActivity">
             <meta-data
                 android:name="android:support.PARENT_ACTIVITY"
-                android:value=".MainActivity"/>
+                android:value=".MainActivity" />
         </activity>
+        <activity android:name=".ShareCoinzActivity"></activity>
     </application>
 
 </manifest>

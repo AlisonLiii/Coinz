@@ -1,36 +1,23 @@
 package com.example.s1891132.coinz
 
-import android.app.Activity
 import android.support.v4.app.Fragment
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.location.Location
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
-import android.support.design.widget.NavigationView
-import android.support.design.widget.Snackbar
-import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
-import android.text.Layout
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import com.example.s1891132.coinz.R.menu.menu_toolbar
+import com.example.s1891132.coinz.Authentication.LogInActivity
+import com.example.s1891132.coinz.ClassAndItem.Coin
 import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.gson.JsonObject
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineListener
 import com.mapbox.android.core.location.LocationEnginePriority
@@ -41,12 +28,9 @@ import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
-import com.mapbox.mapboxsdk.camera.CameraPosition
-import com.mapbox.mapboxsdk.camera.CameraUpdate
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
@@ -55,19 +39,9 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
-import com.mapbox.mapboxsdk.style.layers.SymbolLayer
-import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-import kotlinx.android.synthetic.main.activity_log_in.*
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.*
-import org.jetbrains.anko.appcompat.v7.toolbar
-import org.jetbrains.anko.db.NULL
-import org.jetbrains.anko.design.longSnackbar
-import org.jetbrains.anko.design.snackbar
-import org.json.JSONArray
-import org.json.JSONObject
 import java.util.*
-import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineListener, OnMapReadyCallback,MapboxMap.OnMarkerClickListener {
     //TODO:DELETE TOOLBAR
@@ -288,17 +262,17 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
                 if(it.latlng==marker.position)
                 {
                     if(it.type.equals("PENY",true))
-                        FirestoreUtil.updateWalletBalance(it.value,0.0,0.0,0.0,1)
+                        FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,it.value,0.0,0.0,0.0,1)
                     else if(it.type.equals("DOLR",true))
-                        FirestoreUtil.updateWalletBalance(0.0,it.value,0.0,0.0,1)
+                        FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,0.0,it.value,0.0,0.0,1)
                     else if(it.type.equals("SHIL",true))
-                        FirestoreUtil.updateWalletBalance(0.0,0.0,it.value,0.0,1)
+                        FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,0.0,0.0,it.value,0.0,1)
                     else if(it.type.equals("QUID",true))
-                        FirestoreUtil.updateWalletBalance(0.0,0.0,0.0,it.value,1)
+                        FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,0.0,0.0,0.0,it.value,1)
                     else
                         Log.d("coinz","Invalid type of coinz")
-
-                    FirestoreUtil.addCoinInList(it)
+                    FirestoreUtil.addCoinInList(FirestoreUtil.coinListRef,it)
+                    FirestoreUtil.addCoinInList(FirestoreUtil.markerRef,it)
                 }
             }
             longToast("success")
@@ -331,6 +305,12 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
 
 
     fun parseGeoJson(data:String?){//may not be null
+
+        val iconFactory = IconFactory.getInstance(this)
+        val iconDolr = iconFactory.fromResource(R.drawable.blue_marker)
+        val iconPeny=iconFactory.fromResource(R.drawable.yellow_marker)
+        val iconShil = iconFactory.fromResource(R.drawable.green_marker)
+
         if(data==null)
         {
             Log.e("","no GeoJson information for the day")
@@ -339,6 +319,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
 
 
             val featureCollection=FeatureCollection.fromJson(data)
+
 
             val features:List<Feature>?=featureCollection.features()
             if(features==null)
@@ -359,12 +340,21 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
                     val markercolor=fc.properties()!!.getAsJsonPrimitive("marker-color").toString()
                     /*val icon=IconFactory.getInstance(this)
                     val iconDrawable=ContextCompat.getDrawable(this,R.drawable.puper)*/
-                    val coin=Coin(id,curtype,curvalue.toDouble(),latlng)
-                    FirestoreUtil.coinListRef.document(id).get().addOnSuccessListener { documentSnapshot ->
+                    val coin= Coin(id, curtype, curvalue.toDouble(), latlng)
+                    FirestoreUtil.markerRef.document(id).get().addOnSuccessListener { documentSnapshot ->
                             if(!documentSnapshot.exists())
                             {
-                                coinList.add(coin)//TODO:is here wrong?
+                                coinList.add(coin)
                                 map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng))
+                                //val iconDrawable = ContextCompat.getDrawable(this, R.drawable.blue_marker);
+                                /*if(curtype.equals("DOLR",true))
+                                    map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng).icon(iconDolr))
+                                else if(curtype.equals("SHIL",true))
+                                    map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng).icon(iconShil))
+                                else if(curtype.equals("PENY",true))
+                                    map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng).icon(iconPeny))
+                                else
+                                    map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng))*/
                             }
                         }
 

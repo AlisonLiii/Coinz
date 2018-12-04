@@ -1,9 +1,11 @@
 package com.example.s1891132.coinz
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import com.example.s1891132.coinz.message.AppConstants
+import com.example.s1891132.coinz.message.AppConstants.SHARE_COINZ
 import com.example.s1891132.coinz.message.TextMessage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ListenerRegistration
@@ -18,6 +20,8 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var messagesListenerRegistration: ListenerRegistration
     private var shouldInitRecyclerView = true
     private lateinit var messagesSection: Section
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
@@ -32,7 +36,13 @@ class ChatActivity : AppCompatActivity() {
                 editText_message.setText("")
                 FirestoreUtil.sendMessage(messageToSend,channelId)
             }
+            fab_send_coin.setOnClickListener {
+                val intent= Intent(this,ShareCoinzActivity::class.java)
+                intent.putExtra("RecipentID",otherUserId)
+                startActivityForResult(intent,SHARE_COINZ)//todo:result
+            }
         }
+
     }
 
     private fun updateRecyclerView(messages:List<Item>) {
@@ -55,6 +65,5 @@ class ChatActivity : AppCompatActivity() {
             updateItems()
         recycler_view_messages.scrollToPosition(recycler_view_messages.adapter.itemCount-1)
     }
-    //TODO:notification?
 }
 
