@@ -14,6 +14,7 @@ import android.view.Menu
 import android.view.MenuItem
 import com.example.s1891132.coinz.Authentication.LogInActivity
 import com.example.s1891132.coinz.ClassAndItem.Coin
+import com.example.s1891132.coinz.Fragment.SearchFriendFragment
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -95,6 +96,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
                 R.id.my_property ->
                 {
                     replaceFragment(MyPropertyFragment())
+                    //replaceFragment(SearchFriendFragment())
                 }
                 R.id.signout ->{
                     AuthUI.getInstance()
@@ -307,9 +309,10 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
     fun parseGeoJson(data:String?){//may not be null
 
         val iconFactory = IconFactory.getInstance(this)
-        val iconDolr = iconFactory.fromResource(R.drawable.blue_marker)
-        val iconPeny=iconFactory.fromResource(R.drawable.yellow_marker)
-        val iconShil = iconFactory.fromResource(R.drawable.green_marker)
+        val iconQuid=iconFactory.fromResource(R.drawable.ic_quid)
+        val iconDolr = iconFactory.fromResource(R.drawable.ic_dolr)
+        val iconPeny=iconFactory.fromResource(R.drawable.ic_peny)
+        val iconShil = iconFactory.fromResource(R.drawable.ic_shil)
 
         if(data==null)
         {
@@ -345,16 +348,15 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
                             if(!documentSnapshot.exists())
                             {
                                 coinList.add(coin)
-                                map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng))
-                                //val iconDrawable = ContextCompat.getDrawable(this, R.drawable.blue_marker);
-                                /*if(curtype.equals("DOLR",true))
+                                //map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng))
+                                if(curtype.equals("DOLR",true))
                                     map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng).icon(iconDolr))
                                 else if(curtype.equals("SHIL",true))
                                     map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng).icon(iconShil))
                                 else if(curtype.equals("PENY",true))
                                     map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng).icon(iconPeny))
                                 else
-                                    map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng))*/
+                                    map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng).icon(iconQuid))
                             }
                         }
 
