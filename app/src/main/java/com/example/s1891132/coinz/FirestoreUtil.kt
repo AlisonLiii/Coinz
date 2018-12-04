@@ -24,8 +24,7 @@ import org.jetbrains.anko.design.snackbar
 
 
 object FirestoreUtil {
-
-    private val firestoreInstance: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }//using by lazy means the value of firebaseFirestore get instance only upon first access
+    val firestoreInstance: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }//using by lazy means the value of firebaseFirestore get instance only upon first access
     val currentUserDocRef: DocumentReference
         get() = firestoreInstance.document("users/${FirebaseAuth.getInstance().uid //identify each single user by uid allocated by firebase authentication
                 ?: throw NullPointerException("UID is null")}")//If user not sign in, it's gonna be NULL
@@ -89,7 +88,6 @@ object FirestoreUtil {
                 }
             }
         }
-
 
     fun shareCoinz(view: View, otherID:String, coin: Coin){
         val otherUserDocRef= firestoreInstance.collection("users").document(otherID)
