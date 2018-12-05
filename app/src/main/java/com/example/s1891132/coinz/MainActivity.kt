@@ -10,14 +10,9 @@ import android.os.PersistableBundle
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import com.example.s1891132.coinz.userAuthentication.LogInActivity
 import com.example.s1891132.coinz.dataClassAndItem.Coin
 import com.firebase.ui.auth.AuthUI
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.FirebaseFirestore
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineListener
 import com.mapbox.android.core.location.LocationEnginePriority
@@ -41,32 +36,32 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.*
+import org.jetbrains.anko.design.longSnackbar
 import java.util.*
 
 class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineListener, OnMapReadyCallback,MapboxMap.OnMarkerClickListener {
-    //TODO:DELETE TOOLBAR
     private lateinit var mapView: MapView
     private lateinit var map: MapboxMap
     private lateinit var permissionsManager: PermissionsManager
     private lateinit var originLocation: Location
-    private lateinit var db:FirebaseFirestore
     private lateinit var downloadCoin:String
     private lateinit var settings:SharedPreferences
-    private lateinit var user:FirebaseUser
-    private var walkingDistance:Double=0.0
 
+    private var walkingDistance:Double=0.0
     private var coinList:MutableList<Coin> = ArrayList()
     private var locationEngine: LocationEngine?=null
     private var locationLayerPlugin: LocationLayerPlugin?=null
-    private var downloadMap: DownloadFileTask=DownloadFileTask(DownloadCompleteRunner)//is it possible to be null???
+    private var downloadMap: DownloadFileTask=DownloadFileTask(DownloadCompleteRunner)
     private var coinzFile="CoinzGeoInfoToday"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.title = "Coinz"
+
         // Initialize the action bar drawer toggle instance
         val drawerToggle:ActionBarDrawerToggle = object : ActionBarDrawerToggle(
                 this,
@@ -76,27 +71,21 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
                 R.string.drawer_close
         )
         {
-
         }
+
         // Configure the drawer layout to add listener and show icon on toolbar
         drawerToggle.isDrawerIndicatorEnabled = true
         drawer_layout.addDrawerListener(drawerToggle)
         drawerToggle.syncState()
+
         // Set navigation view navigation item selected listener
         navigation_view.setNavigationItemSelectedListener{
             when (it.itemId){
                 R.id.my_account ->
-                {
-                    replaceFragment(MyAccountFragment())//TODO:ID LAYOUT
-                }
-                R.id.people -> {
-                    replaceFragment(PeopleFragment())
-                }
+                { replaceFragment(MyAccountFragment()) }
+                R.id.people -> { replaceFragment(PeopleFragment()) }
                 R.id.my_property ->
-                {
-                    replaceFragment(MyPropertyFragment())
-                    //replaceFragment(SearchFriendFragment())
-                }
+                { replaceFragment(MyPropertyFragment()) }
                 R.id.signout ->{
                     AuthUI.getInstance()
                             .signOut(this)
@@ -110,17 +99,20 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
             true
         }
 
-        db=FirebaseFirestore.getInstance()
+
         Mapbox.getInstance(applicationContext,getString(R.string.access_token))
         mapView=findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
+
+        //get GeoJson information of the day
         settings=getSharedPreferences(coinzFile,Context.MODE_PRIVATE)
-        downloadCoin=settings.getString(currentDate(),"Unable to load coinz. Check your network connection.")
-        if(downloadCoin=="Unable to load coinz. Check your network connection.")
+        downloadCoin=settings.getString(currentDate(),"No GeoJson for today")
+        //if shared preference file doesn't have today's information, the variable downloadCoin="No GeoJson for today"
+        if(downloadCoin=="No GeoJson for today")
         {
-            downloadMap.execute(currentUrl())//unable to load coinz:cannot
+            downloadMap.execute(currentUrl())//download today's GeoJson information from the server
         }
-        FirestoreUtil.newDayUpdateOrNot()
+        FirestoreUtil.newDayUpdateOrNot()//zero out wallet balance, coinz and walking distance if it is a new day
         mapView.getMapAsync(this)
 
     }
@@ -128,49 +120,93 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
     override fun onMapReady(mapboxMap: MapboxMap?) {
         map=mapboxMap!!
         //val view=this.findViewById<View>(android.R.id.content)
-        //view.longSnackbar("Please wait for some seconds to get your location","OK")
-        {}
-        val dialog=indeterminateProgressDialog(message = "Please wait a bit", title="Getting your location")
-        {
-
-        }
-
-        //longToast("Please wait for a second to get your location")
+        contentView?.longSnackbar("Please wait for some seconds to get your location","OK") {}
         enableLocation()
         //if have files for today, do not need to store
-        if(downloadCoin=="Unable to load coinz. Check your network connection."){
-            storeCoinz(DownloadCompleteRunner.result)
+        if(downloadCoin=="No GeoJson for today"){
+            storeCoinz(DownloadCompleteRunner.result)//store the GeoJson downloaded in shared preference file
         }
-        downloadCoin=settings.getString(currentDate(),"")
-        parseGeoJson(downloadCoin)
-        user = FirebaseAuth.getInstance().currentUser!!
+        downloadCoin=settings.getString(currentDate(),"")//get GeoJson information of the day from shared preference file
+        parseGeoJson(downloadCoin)//parse GeoJson information to add markers
     }
 
 
     private fun replaceFragment(fragment: Fragment){
         supportFragmentManager.beginTransaction().apply{
             replace(R.id.fragment_frame,fragment)
-            addToBackStack(null)// press the Back on the phone and return to the main screen
+            addToBackStack(null)//this enables user to press the Back button on the phone and return to the main screen
             commit()
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu):Boolean{
-        menuInflater.inflate(R.menu.menu_toolbar,menu)
-        return true
+
+    //store information in shared preference file
+    private fun storeCoinz(data:String?){
+        val editor=getSharedPreferences(coinzFile, Context.MODE_PRIVATE).edit()
+        editor.putString(currentDate(),data)
+        editor.apply()
     }
 
-    //still under construction
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        AuthUI.getInstance()
-                .signOut(this)
-                .addOnCompleteListener {
-                    longToast("sign out successfully")
+
+    private fun parseGeoJson(data:String?){
+
+        //get icons representing four types of currency
+        val iconFactory = IconFactory.getInstance(this)
+        val iconQuid=iconFactory.fromResource(R.drawable.ic_quid)
+        val iconDolr = iconFactory.fromResource(R.drawable.ic_dolr)
+        val iconPeny=iconFactory.fromResource(R.drawable.ic_peny)
+        val iconShil = iconFactory.fromResource(R.drawable.ic_shil)
+
+        if(data==null)
+        {
+            Log.e("","no GeoJson information for the day")
+        }
+        else{
+
+            val featureCollection=FeatureCollection.fromJson(data)
+            val features:List<Feature>?=featureCollection.features()
+            if(features==null)
+            {
+                Log.e("","no GeoJson information for the day")
+            }
+            else{
+                for(fc in features)
+                {
+                    val point=fc.geometry()as Point
+                    val latlng=LatLng(point.latitude(),point.longitude())
+                    val curtype=fc.properties()!!.getAsJsonPrimitive("currency").toString().replace("\"", "")
+                    //use .replace to remove the quotation mark of the String
+                    val id=fc.properties()!!.getAsJsonPrimitive("id").toString().replace("\"", "")//or int
+                    val curvalue=fc.properties()!!.getAsJsonPrimitive("value").toString().replace("\"", "")
+                    val coin= Coin(id, curtype, curvalue.toDouble(), latlng)
+
+                    FirestoreUtil.markerRef.document(id).get().addOnSuccessListener { documentSnapshot ->
+                        //add the markers on the map which have not been successfully collected during the day
+                        if(!documentSnapshot.exists())
+                        {
+                            coinList.add(coin)
+                            //the coins on the map which have not been successfully collected during the day
+                            if(curtype.equals("DOLR",true))
+                                map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng).icon(iconDolr))
+                            else if(curtype.equals("SHIL",true))
+                                map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng).icon(iconShil))
+                            else if(curtype.equals("PENY",true))
+                                map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng).icon(iconPeny))
+                            else
+                                map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng).icon(iconQuid))
+                        }
+                    }
+
                 }
-        // [END auth_fui_signout]
-        return true
+            }
+
+        }
+
     }
 
+
+
+    //Location service
     fun enableLocation(){
         if(PermissionsManager.areLocationPermissionsGranted(this))
         {
@@ -209,13 +245,11 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
     }
 
     private fun setCameraPosition(location: Location){
-
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude,location.longitude),15.0))
     }
 
 
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
-        //Present a dialog explaining why they need to grant access
     }
 
     override fun onPermissionResult(granted: Boolean) {
@@ -230,25 +264,17 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
 
     override fun onLocationChanged(location: Location?) {
        location?.let {
+           //calculate user's walking distance
            if(::originLocation.isInitialized)
            {
                walkingDistance+=originLocation.distanceTo(location).toDouble()
            }
            originLocation=location
            FirestoreUtil.updateWalkingDistance(walkingDistance)
-           Log.i("walking",walkingDistance.toString())
            setCameraPosition(location)
-           /*val intent=Intent("LocationChanged")
-           intent.setType("text/plain")
-           sendBroadcast(intent);*/
        }
 
         map.setOnMarkerClickListener(this)
-    }
-
-@SuppressWarnings("MissingPermission")
-    override fun onConnected() {
-     locationEngine?.requestLocationUpdates()
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {
@@ -257,139 +283,44 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
             marker.hideInfoWindow()
         }
         else marker.showInfoWindow(map,mapView)
-        if(marker.position.distanceTo(LatLng(originLocation.latitude,originLocation.longitude))<25)
+
+        //only after the system get user's current location, the user can click on the markers and collect coinz
+        if(::originLocation.isInitialized)
         {
-            coinList.forEach {
-                if(it.latlng==marker.position)
-                {
-                    if(it.type.equals("PENY",true))
-                        FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,it.value,0.0,0.0,0.0,1)
-                    else if(it.type.equals("DOLR",true))
-                        FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,0.0,it.value,0.0,0.0,1)
-                    else if(it.type.equals("SHIL",true))
-                        FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,0.0,0.0,it.value,0.0,1)
-                    else if(it.type.equals("QUID",true))
-                        FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,0.0,0.0,0.0,it.value,1)
-                    else
-                        Log.d("coinz","Invalid type of coinz")
-                    FirestoreUtil.addCoinInList(FirestoreUtil.coinListRef,it)
-                    FirestoreUtil.addCoinInList(FirestoreUtil.markerRef,it)
-                }
-            }
-            longToast("success")
-            //TODO:COINLIST STORE in firebase
-            marker.remove()
-            /*val items= HashMap<String,Any>()
-            items.put("SHIL",777)
-            //unresolved bug here
-            Log.i("this",marker.snippet)
-
-            db.collection("user wallet").document(user.uid).set(items)
-                    .addOnSuccessListener {
-                        longToast("success added")
+            if(marker.position.distanceTo(LatLng(originLocation.latitude,originLocation.longitude))<25)
+            {
+                coinList.forEach {//iterate the coins which have not been collected for the day
+                    if(it.latlng==marker.position)
+                    {
+                        if(it.type.equals("PENY",true))
+                            FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,it.value,0.0,0.0,0.0,1)
+                        //operation:1 means adding coins
+                        else if(it.type.equals("DOLR",true))
+                            FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,0.0,it.value,0.0,0.0,1)
+                        else if(it.type.equals("SHIL",true))
+                            FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,0.0,0.0,it.value,0.0,1)
+                        else if(it.type.equals("QUID",true))
+                            FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,0.0,0.0,0.0,it.value,1)
+                        else
+                            Log.d("coinz","Invalid type of coinz")
+                        FirestoreUtil.addCoinInList(FirestoreUtil.coinSelfCollectListRef,it)
+                        //record the markers that need to be removed the next time user open the app
+                        FirestoreUtil.addCoinInList(FirestoreUtil.markerRef,it)
                     }
-                    .addOnFailureListener{
-                        longToast("Failure added")
-                    }*/
+                }
+                contentView?.longSnackbar("Successfully collect a coin!")
+                marker.remove()
+            }
+            else contentView?.longSnackbar("Please get closer!")
         }
-        else longToast("fail")
-
+        else longToast("Wait for the system to get your location!")
         return true
     }
 
 
-    fun storeCoinz(data:String?){
-        val editor=getSharedPreferences(coinzFile, Context.MODE_PRIVATE).edit()
-        editor.putString(currentDate(),data)
-        editor.apply()
-    }
-
-
-    fun parseGeoJson(data:String?){//may not be null
-
-        val iconFactory = IconFactory.getInstance(this)
-        val iconQuid=iconFactory.fromResource(R.drawable.ic_quid)
-        val iconDolr = iconFactory.fromResource(R.drawable.ic_dolr)
-        val iconPeny=iconFactory.fromResource(R.drawable.ic_peny)
-        val iconShil = iconFactory.fromResource(R.drawable.ic_shil)
-
-        if(data==null)
-        {
-            Log.e("","no GeoJson information for the day")
-        }
-        else{
-
-
-            val featureCollection=FeatureCollection.fromJson(data)
-
-
-            val features:List<Feature>?=featureCollection.features()
-            if(features==null)
-            {
-                Log.e("","no GeoJson information for the day")
-            }
-            else{
-                for(fc in features)
-                {
-
-                    val point=fc.geometry()as Point
-                    val latlng=LatLng(point.latitude(),point.longitude())
-                    //Log.i("marker",long.toString())
-                    val curtype=fc.properties()!!.getAsJsonPrimitive("currency").toString().replace("\"", "")
-                    val id=fc.properties()!!.getAsJsonPrimitive("id").toString().replace("\"", "")//or int
-                    val curvalue=fc.properties()!!.getAsJsonPrimitive("value").toString().replace("\"", "");//or int
-                    val markersymbol=fc.properties()!!.getAsJsonPrimitive("marker-symbol").toString()//or int?
-                    val markercolor=fc.properties()!!.getAsJsonPrimitive("marker-color").toString()
-                    /*val icon=IconFactory.getInstance(this)
-                    val iconDrawable=ContextCompat.getDrawable(this,R.drawable.puper)*/
-                    val coin= Coin(id, curtype, curvalue.toDouble(), latlng)
-                    FirestoreUtil.markerRef.document(id).get().addOnSuccessListener { documentSnapshot ->
-                            if(!documentSnapshot.exists())
-                            {
-                                coinList.add(coin)
-                                //map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng))
-                                if(curtype.equals("DOLR",true))
-                                    map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng).icon(iconDolr))
-                                else if(curtype.equals("SHIL",true))
-                                    map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng).icon(iconShil))
-                                else if(curtype.equals("PENY",true))
-                                    map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng).icon(iconPeny))
-                                else
-                                    map.addMarker(MarkerOptions().title(curtype).snippet(curvalue).position(latlng).icon(iconQuid))
-                            }
-                        }
-
-                }
-            }
-
-            /*val source=GeoJsonSource("coinzsource",featureCollection)
-            map.addSource(source)
-            val markerLayer=SymbolLayer("mylayerid","mysourceid")
-            map.addLayer(markerLayer)*/
-
-
-            /*Bitmap icon = BitmapFactory.decodeResource(
-      BasicSymbolLayerActivity.this.getResources(), R.drawable.blue_marker_view);
-
-    // Add the marker image to map.toDouble()
-    mapboxMap.addImage("my-marker-image", icon);
-
-    SymbolLayer markers = new SymbolLayer("marker-layer", "marker-source")
-      .withProperties(PropertyFactory.iconImage("my-marker-image"));
-    mapboxMap.addLayer(markers);
-
-    // Add the selected marker source and layer
-    FeatureCollection emptySource = FeatureCollection.fromFeatures(new Feature[]{});
-    Source selectedMarkerSource = new GeoJsonSource("selected-marker", emptySource);
-    mapboxMap.addSource(selectedMarkerSource);
-
-    SymbolLayer selectedMarker = new SymbolLayer("selected-marker-layer", "selected-marker")
-      .withProperties(PropertyFactory.iconImage("my-marker-image"));
-    mapboxMap.addLayer(selectedMarker);
-
-mapboxMap.addOnMapClickListener(this);*/
-        }
-
+    @SuppressWarnings("MissingPermission")
+    override fun onConnected() {
+     locationEngine?.requestLocationUpdates()
     }
 
 
@@ -401,21 +332,8 @@ mapboxMap.addOnMapClickListener(this);*/
             locationEngine?.requestLocationUpdates()
             locationLayerPlugin?.onStart()
         }
-        /*if (locationEngine != null) {
-
-            try {
-                locationEngine?.requestLocationUpdates()
-            } catch (ignored: SecurityException) {
-            }
-
-            locationEngine?.addLocationEngineListener(this)
-        }*/
         mapView.onStart()
 
-
-        //val settings=getSharedPreferences(preferencesFile, Context.MODE_PRIVATE)//restore preferences
-        //downloadDate=settings.getString("lastDownloadDate","")//use ""as default value(this might be the first time the app is run)
-        //Log.d(tag,"[onStart] Recalled lastDownloadDate is '$downloadDate'")
 
     }
 
@@ -431,14 +349,6 @@ mapboxMap.addOnMapClickListener(this);*/
 
     override fun onStop() {
         super.onStop()
-        //Log.d(tag,"[onStop] Storing lastDownloadDate of $downloadDate")
-        //All objets are from android.context.Context
-        //val settings=getSharedPreferences(preferencesFile,Context.MODE_PRIVATE)
-        //We need an Editor object to make preference changes.
-        //val editor=settings.edit()
-        //editor.putString("lastDownloadDate",downloadDate)
-        //apply the edits
-        //editor.apply()
         locationEngine?.removeLocationUpdates()
         locationLayerPlugin?.onStop()
         mapView.onStop()
@@ -462,9 +372,6 @@ mapboxMap.addOnMapClickListener(this);*/
         mapView.onLowMemory()
     }
 
-    companion object {
-        private const val RC_SIGN_IN = 123
-    }
 }
 
 
