@@ -48,9 +48,18 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="People playing the game" />
+            android:textSize="30dp"
+            android:fontFamily="cursive"
+            android:text="People playing the game.." />
+        <TextView
+            android:layout_marginTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:text="Click and chat with them" />
 
         <android.support.v7.widget.RecyclerView
+            android:layout_marginTop="14dp"
             android:id="@+id/recycler_view_people"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

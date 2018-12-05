@@ -13,9 +13,12 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_activity_bank_coinz">BankCoinzActivity</string>
-    <string name="icon_put_in_account">Bank in</string>
+    <string name="coin_hand_over">Hand over!</string>
     <string name="input_email_frend">Input the email of your friend</string>
     <string name="today_rate">Rate of the day</string>
     <string name="convert_to_gold">Exchange gold!</string>
+    <string name="camp_is_AI">"camp:\nAI"</string>
+    <string name="camp_is_human">"camp:\nHuman"</string>
     <string name="input_your_friend_email">Input your friend\'s email here!</string>
+    <string name="no_coin_in_wallet">Oops! You have no spare coinz you yourself collected in your wallet</string>
 </resources>

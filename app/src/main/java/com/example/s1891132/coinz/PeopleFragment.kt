@@ -25,38 +25,46 @@ import org.jetbrains.anko.support.v4.startActivity
 
 class PeopleFragment : Fragment() {
 
-    private lateinit var userListenerRegistration:ListenerRegistration //for getting full list of people
+    //This class is adapted from the tutorial below
+    //https://www.youtube.com/watch?v=a9I7Ppzh1_Y&index=3&list=PLB6lc7nQ1n4h5tzT3tu_YSy9VNrVUR_4W
+
+    private lateinit var userListenerRegistration:ListenerRegistration //for getting a list of all the users
+    private lateinit var peopleSection: Section
+
     private var shouldInitRecyclerView = true
 
-    private lateinit var peopleSection: Section
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+
         val view=inflater.inflate(R.layout.fragment_people, container, false)
         val searchButton=view.findViewById<ImageButton>(R.id.imageView_email_search)
         val searchText=view.findViewById<TextInputEditText>(R.id.editText_email_search)
+        //listen to all the registered users
         userListenerRegistration = FirestoreUtil.addUsersListener(this.activity!!, this::updateRecyclerView)
         view.apply {
+
+            //search for a user with particular email address
             searchButton.setOnClickListener {
                 if (searchText.text.isNullOrBlank()) {
-                    snackbar(view,"Enter email please")
+                    view.snackbar("Enter email please")
                     return@setOnClickListener
                 }
-                var id = "nouserwiththisemail"
                 FirestoreUtil.firestoreInstance.collection("users").whereEqualTo("email", searchText.text.toString())
                         .get().addOnSuccessListener {
                             if(it.isEmpty)
-                                snackbar(view,"No such user")
+                                view.snackbar("No such user.")
                             else {
                                 it.forEach {
-                                    id = it["id"] as String
+                                    val id = it["id"] as String
                                     FirestoreUtil.getCurrentUser { CoinzUser->
-                                        if(CoinzUser.id!=id)
+                                        if(CoinzUser.id!=id)//the target user is not the current user itself
                                         {
-                                            val intent= Intent(context, ShareCoinzActivity::class.java)
+                                            val intent= Intent(context, ShareCoinzActivity::class.java)//go to ShareCoinzActivity to share coinz
                                             intent.putExtra("RecipentID",id)
                                             context?.startActivity(intent)
                                         }
-                                        else snackbar(view,"you cannot search yourself")
+                                        else view.snackbar("you cannot search yourself!")
                                     }
                                 }
                             }
@@ -65,7 +73,6 @@ class PeopleFragment : Fragment() {
         }
         return view
     }
-    //TODO:too slow!
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -77,7 +84,7 @@ class PeopleFragment : Fragment() {
         fun init() {
             recycler_view_people.apply {
                 layoutManager = LinearLayoutManager(this@PeopleFragment.context)
-                adapter = GroupAdapter<ViewHolder>().apply {
+                adapter = GroupAdapter<ViewHolder>().apply {//list all the people
                     peopleSection = Section(items)
                     add(peopleSection)
                     setOnItemClickListener(onItemClick)
@@ -95,8 +102,8 @@ class PeopleFragment : Fragment() {
         }
 
 
-    private val onItemClick = OnItemClickListener { item, view ->
-        if (item is PersonItem) {
+    private val onItemClick = OnItemClickListener { item, _ ->
+        if (item is PersonItem) {//go to ChatActivity after clicking on a person item
             startActivity<ChatActivity>(
                     AppConstants.USER_NAME to item.person.name,
                     AppConstants.USER_ID to item.person.id

@@ -46,7 +46,7 @@
             android:id="@+id/bank_in_btn"
             android:layout_width="60dp"
             android:layout_height="30dp"
-            android:text="@string/icon_put_in_account"
+            android:text="@string/coin_hand_over"
             android:textSize="10dp"/>
     </LinearLayout>
 

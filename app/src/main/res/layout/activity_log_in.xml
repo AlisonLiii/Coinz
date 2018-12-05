@@ -52,7 +52,7 @@
             android:id="@+id/signin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/holo_orange_light"
+            android:background="@drawable/roundedbutton"
             android:layout_gravity="center"
             android:text="Sign in"
             android:textAllCaps="false"/>
@@ -62,7 +62,7 @@
             android:id="@+id/register"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/holo_orange_light"
+            android:background="@drawable/roundedbutton"
             android:layout_gravity="center"
             android:text="Register"
             android:textAllCaps="false"/>

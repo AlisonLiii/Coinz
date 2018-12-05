@@ -1,5 +1,6 @@
 package com.example.s1891132.coinz.adapterForListView
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +14,7 @@ import com.example.s1891132.coinz.R
 // This class is adapted from the tutorial below
 // https://www.raywenderlich.com/155-android-listview-tutorial-with-kotlin
 
-class CoinAdapter(private val context: Context, public val dataSource: ArrayList<Coin>) : BaseAdapter() {
+class CoinAdapter(context: Context,private val dataSource: ArrayList<Coin>) : BaseAdapter() {
 
     private val inflater: LayoutInflater
             = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -33,6 +34,8 @@ class CoinAdapter(private val context: Context, public val dataSource: ArrayList
     }
 
 
+
+    @SuppressLint("ViewHolder")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         // Get view for row item
         val rowView = inflater.inflate(R.layout.coinz_list_view, parent, false)

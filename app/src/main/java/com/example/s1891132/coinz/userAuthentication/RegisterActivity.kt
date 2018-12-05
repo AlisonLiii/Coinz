@@ -10,42 +10,43 @@ import com.example.s1891132.coinz.R
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_register.*
 import org.jetbrains.anko.*
+import org.jetbrains.anko.design.longSnackbar
 
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var mAuth:FirebaseAuth
-    private  var camp:Double=2.0
-    private lateinit var username:String
+    private  var camp:Double=2.0//default value, means nothing. 0.0 means AI, 1.0 means human
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
+
         mAuth= FirebaseAuth.getInstance()
-        alert("You can choose between two camps: AI and human"){
-            title="About the coinz game"
-            positiveButton("I choose AI"){camp=0.0 }
-            negativeButton("I choose human"){camp=1.0
-            }
+
+        //choose camp
+        alert("This is a game based on group confrontation. You can choose between two camps: AI and human. The winner camp can rule School of Informatics in University of Edinburgh! "){
+            title="About the Coinz game..."
+            positiveButton("I choose to be AI"){camp=0.0 }
+            negativeButton("I choose to be human"){camp=1.0 }
         }.show().apply {
-            getButton(AlertDialog.BUTTON_NEGATIVE)?.let {
+            //to get two buttons look the same and do not focus on any of it. (The default setting is to focus on negative button)
+            this.getButton(AlertDialog.BUTTON_NEGATIVE)?.let {
                 it.focusable = View.NOT_FOCUSABLE
             }
-            getButton(AlertDialog.BUTTON_POSITIVE)?.let{
-                it.focusable=View.NOT_FOCUSABLE
-            }
         }
-            /*alert("You can choose between two camps: AI and human", "About the Coinz game") {
-                positiveButton("I choose AI",{ dialog ->dialog.dismiss() })
-                negativeButton("I choose Human",{dialog->dialog.dismiss() })
-            }.show().apply { getButton(AlertDialog.BUTTON_NEGATIVE)?.let{
-                it.focusable= View.NOT_FOCUSABLE } }*/
+
+        //go back to sign in activity
         back_to_signin.setOnClickListener {
             startActivity(Intent(this@RegisterActivity, LogInActivity::class.java))
         }
+
+
+        //submit register request
         registersubmit.setOnClickListener {
-            username=registerusername.text.toString()
+            val username=registerusername.text.toString()
             val email=registeremail.text.toString()
             val password=registerpassword.text.toString()
+
             if(username.isEmpty()||email.isEmpty()||password.isEmpty()) {
                 toast("Please enter text in username/email/password")
                 return@setOnClickListener
@@ -54,15 +55,15 @@ class RegisterActivity : AppCompatActivity() {
             mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener { task->
                 if(task.isSuccessful)
                 {
+                    //Initialize user information in Firestore
                     FirestoreUtil.initCurrentUserIfFirstTime(username, camp) {
                         longToast("create account success.Go to log in now!")
-                        startActivity(Intent(this@RegisterActivity, LogInActivity::class.java))
+                        startActivity(Intent(this@RegisterActivity, LogInActivity::class.java))//Go to log in activity
                     }
 
                 }
                 else{
-                    //TODO:EMAIL TYPE WRONG
-                    longToast("Failed.Please retry.The email address you enter may be registered before")
+                    contentView?.longSnackbar("Failed.The email address may have been registered or is not in valid format, or the password is too easy  ")
                 }
             }
         }

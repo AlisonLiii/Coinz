@@ -15,6 +15,18 @@
         android:elevation="4dp"
         android:fitsSystemWindows="true" />
 
+    <TextView
+        android:id="@+id/no_coinz_share"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="280dp"
+        android:textSize="15dp"
+        android:text="@string/no_coin_in_wallet"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <ListView
         android:layout_marginTop="?android:attr/actionBarSize"
         android:id="@+id/share_coin_list_view"

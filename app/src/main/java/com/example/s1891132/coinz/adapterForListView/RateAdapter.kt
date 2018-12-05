@@ -1,5 +1,6 @@
 package com.example.s1891132.coinz.adapterForListView
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -9,8 +10,8 @@ import android.widget.TextView
 import com.example.s1891132.coinz.R
 import com.example.s1891132.coinz.dataClassAndItem.RateItem
 
-class RateAdapter(private val context: Context,
-                  public val dataSource: ArrayList<RateItem>) : BaseAdapter() {
+class RateAdapter( context: Context,
+                  private val dataSource: ArrayList<RateItem>) : BaseAdapter() {
 
     private val inflater: LayoutInflater
             = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -30,6 +31,7 @@ class RateAdapter(private val context: Context,
     }
 
 
+    @SuppressLint("ViewHolder")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         // Get view for row item
         val rowView = inflater.inflate(R.layout.item_rate, parent, false)

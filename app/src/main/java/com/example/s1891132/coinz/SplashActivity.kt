@@ -15,7 +15,7 @@ class SplashActivity : AppCompatActivity() {
         if(FirebaseAuth.getInstance().currentUser==null)
             startActivity<LogInActivity>()
         else
-            startActivity<MainActivity>()
+            startActivity<MainActivity>()//you don't have to log in every time you open the app
         finish()
     }
 }
