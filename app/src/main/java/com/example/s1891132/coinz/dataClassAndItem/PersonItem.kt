@@ -1,4 +1,4 @@
-package com.example.s1891132.coinz.ClassAndItem
+package com.example.s1891132.coinz.dataClassAndItem
 
 import com.xwray.groupie.kotlinandroidextensions.Item
 import com.xwray.groupie.kotlinandroidextensions.ViewHolder
@@ -13,7 +13,7 @@ class PersonItem(val person: CoinzUser,
     override fun bind(viewHolder: ViewHolder, position: Int) {
         viewHolder.person_name_item.text = person.name
         viewHolder.person_bio_item.text = person.bio
-        if(person.camp==0)
+        if(person.camp==0.0)
             viewHolder.person_camp_item.text="camp:\n"+"AI"
         else
             viewHolder.person_camp_item.text="camp:\n"+"Human"

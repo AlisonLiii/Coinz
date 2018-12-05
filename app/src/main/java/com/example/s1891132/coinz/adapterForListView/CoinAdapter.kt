@@ -1,4 +1,4 @@
-package com.example.s1891132.coinz.AdapterForListView
+package com.example.s1891132.coinz.adapterForListView
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,13 +7,13 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 
 import android.widget.TextView
-import com.example.s1891132.coinz.ClassAndItem.Coin
+import com.example.s1891132.coinz.dataClassAndItem.Coin
 import com.example.s1891132.coinz.R
 
-//https://www.raywenderlich.com/155-android-listview-tutorial-with-kotlin
+// This class is adapted from the tutorial below
+// https://www.raywenderlich.com/155-android-listview-tutorial-with-kotlin
 
-class CoinAdapter(private val context: Context,
- public val dataSource: ArrayList<Coin>) : BaseAdapter() {
+class CoinAdapter(private val context: Context, public val dataSource: ArrayList<Coin>) : BaseAdapter() {
 
     private val inflater: LayoutInflater
             = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -38,14 +38,10 @@ class CoinAdapter(private val context: Context,
         val rowView = inflater.inflate(R.layout.coinz_list_view, parent, false)
         val curtypeTextView = rowView.findViewById(R.id.cur_type) as TextView
         val curvalueTextView = rowView.findViewById(R.id.cur_value) as TextView
-        //val bankBtn=rowView.findViewById<Button>(R.id.bank_in_btn)
         val coin = getItem(position) as Coin
         curtypeTextView.text = coin.type
         curvalueTextView.text=coin.value.toString()
-        /*bankBtn.setOnClickListener{
-            dataSource.removeAt(position)
-            notifyDataSetChanged()
-        }*/
+
         return rowView
     }
 

@@ -1,4 +1,4 @@
-package com.example.s1891132.coinz.ClassAndItem
+package com.example.s1891132.coinz.dataClassAndItem
 
 import com.mapbox.mapboxsdk.geometry.LatLng
 

@@ -1,4 +1,4 @@
-package com.example.s1891132.coinz.Authentication
+package com.example.s1891132.coinz.userAuthentication
 
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity

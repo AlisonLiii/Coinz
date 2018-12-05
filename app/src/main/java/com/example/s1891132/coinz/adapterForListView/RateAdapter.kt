@@ -1,4 +1,4 @@
-package com.example.s1891132.coinz.AdapterForListView
+package com.example.s1891132.coinz.adapterForListView
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
 import com.example.s1891132.coinz.R
-import com.example.s1891132.coinz.ClassAndItem.RateItem
+import com.example.s1891132.coinz.dataClassAndItem.RateItem
 
 class RateAdapter(private val context: Context,
                   public val dataSource: ArrayList<RateItem>) : BaseAdapter() {

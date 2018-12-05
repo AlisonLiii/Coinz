@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.AdapterView
 import android.widget.ListView
-import com.example.s1891132.coinz.AdapterForListView.CoinAdapter
-import com.example.s1891132.coinz.ClassAndItem.Coin
+import com.example.s1891132.coinz.adapterForListView.CoinAdapter
+import com.example.s1891132.coinz.dataClassAndItem.Coin
 import kotlinx.android.synthetic.main.activity_share_coinz.*
 import org.jetbrains.anko.design.snackbar
 import java.util.ArrayList

@@ -43,7 +43,7 @@ class MyAccountFragment : Fragment() {
                 uid.setText(CoinzUser.id)
                 edit_bio.setText(CoinzUser.bio)
                 walking_distance_text.setText(CoinzUser.walkingDistance.toString())
-                if(CoinzUser.camp==0)
+                if(CoinzUser.camp==0.0)
                     camp_text.setText("AI")
                 else
                     camp_text.setText("Human")

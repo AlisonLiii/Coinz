@@ -17,4 +17,5 @@
     <string name="input_email_frend">Input the email of your friend</string>
     <string name="today_rate">Rate of the day</string>
     <string name="convert_to_gold">Exchange gold!</string>
+    <string name="input_your_friend_email">Input your friend\'s email here!</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.example.s1891132.coinz.Authentication
+package com.example.s1891132.coinz.userAuthentication
 
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
@@ -14,7 +14,7 @@ import org.jetbrains.anko.*
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var mAuth:FirebaseAuth
-    private  var camp:Int=2
+    private  var camp:Double=2.0
     private lateinit var username:String
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,8 +23,8 @@ class RegisterActivity : AppCompatActivity() {
         mAuth= FirebaseAuth.getInstance()
         alert("You can choose between two camps: AI and human"){
             title="About the coinz game"
-            positiveButton("I choose AI"){camp=0 }
-            negativeButton("I choose human"){camp=1
+            positiveButton("I choose AI"){camp=0.0 }
+            negativeButton("I choose human"){camp=1.0
             }
         }.show().apply {
             getButton(AlertDialog.BUTTON_NEGATIVE)?.let {

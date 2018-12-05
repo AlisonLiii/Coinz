@@ -12,9 +12,8 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import com.example.s1891132.coinz.Authentication.LogInActivity
-import com.example.s1891132.coinz.ClassAndItem.Coin
-import com.example.s1891132.coinz.Fragment.SearchFriendFragment
+import com.example.s1891132.coinz.userAuthentication.LogInActivity
+import com.example.s1891132.coinz.dataClassAndItem.Coin
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser

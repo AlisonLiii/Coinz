@@ -1,4 +1,4 @@
-package com.example.s1891132.coinz.ClassAndItem
+package com.example.s1891132.coinz.dataClassAndItem
 
 import android.content.Context
 import kotlinx.android.synthetic.main.item_rate.*

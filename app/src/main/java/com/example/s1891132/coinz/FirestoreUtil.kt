@@ -3,9 +3,9 @@ package com.example.s1891132.coinz
 import android.content.Context
 import android.util.Log
 import android.view.View
-import com.example.s1891132.coinz.ClassAndItem.Coin
-import com.example.s1891132.coinz.ClassAndItem.CoinzUser
-import com.example.s1891132.coinz.ClassAndItem.PersonItem
+import com.example.s1891132.coinz.dataClassAndItem.Coin
+import com.example.s1891132.coinz.dataClassAndItem.CoinzUser
+import com.example.s1891132.coinz.dataClassAndItem.PersonItem
 import com.example.s1891132.coinz.message.ChatChannel
 import com.example.s1891132.coinz.message.TextMessage
 import com.example.s1891132.coinz.message.TextMessageItem
@@ -22,6 +22,7 @@ import org.jetbrains.anko.design.snackbar
  * https://www.youtube.com/watch?v=eHA9jGT_87Q
  */
 
+//TODO:initialize
 
 object FirestoreUtil {
     val firestoreInstance: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }//using by lazy means the value of firebaseFirestore get instance only upon first access
@@ -34,12 +35,18 @@ object FirestoreUtil {
         get()= currentUserDocRef.collection("coinFromOthers")
     val markerRef: CollectionReference
         get()= currentUserDocRef.collection("markerForTheDay")
+    val aiGoldRef:DocumentReference
+        get() =  firestoreInstance.collection("ForRanking").document("AI")
+    val humanGoldRef:DocumentReference
+        get() =  firestoreInstance.collection("ForRanking").document("Human")
+    val individualGoldRef:DocumentReference
+        get() =  firestoreInstance.collection("ForRanking").document("IndividualGold")
 
 
     private val chatChannelsCollectionRef = firestoreInstance.collection("chatChannels")
     //Initialise the user profile in Firestore when he/she first sign in;
     // if he/she has signed in before on another device, this method would not call
-    fun initCurrentUserIfFirstTime(name:String,camp:Int, onComplete: () -> Unit) {
+    fun initCurrentUserIfFirstTime(name:String,camp:Double, onComplete: () -> Unit) {
         currentUserDocRef.get().addOnSuccessListener { documentSnapshot ->
             if (!documentSnapshot.exists()) {//Create user profile if the user's profile doesn't exist before
                 val newUser = CoinzUser(name, FirebaseAuth.getInstance().currentUser!!.uid, FirebaseAuth.getInstance().currentUser!!.email!!, "", camp, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, currentDate(), 0.0)//TODO:maybe a null-safety problem here
@@ -82,8 +89,48 @@ object FirestoreUtil {
                     moneyToConvert = document["accountQuid"] as Double
                 val originGold=document["accountGold"] as Double
                 val accountGoldMap = mutableMapOf<String, Any>()
-                accountGoldMap["accountGold"]=moneyToConvert*rate+originGold as Double
+
+                val value=moneyToConvert*rate+originGold as Double
+                accountGoldMap["accountGold"]=value
                 currentUserDocRef.update(accountGoldMap)
+                Log.i("updateaaa","Youuuu")
+                individualGoldRef.get().addOnSuccessListener { document->
+                    if(document!=null)
+                    {
+                        val originIndiGold=document["accountGold"] as Double
+                        if(originIndiGold<value)
+                        {
+                            val indiMap= mutableMapOf<String, Any>()
+                            indiMap["accountGold"]=value
+                            individualGoldRef.update(indiMap)
+                        }
+                    }
+                }
+                //TODO:INIT in the app to make it double
+                if(document["camp"]==0.0)
+                {
+                    aiGoldRef.get().addOnSuccessListener {document->
+                        if(document!=null)
+                        {
+                            val originAiGold=document["accountGold"] as Double
+                            val aiMap= mutableMapOf<String, Any>()
+                            aiMap["accountGold"]=originAiGold+moneyToConvert*rate
+                            aiGoldRef.update(aiMap)
+                        }
+                    }
+                }
+                else{
+                    humanGoldRef.get().addOnSuccessListener {document->
+                        if(document!=null)
+                        {
+                            val originHumanGold=document["accountGold"] as Double
+                            val humanMap= mutableMapOf<String, Any>()
+                            humanMap["accountGold"]=originHumanGold+moneyToConvert*rate
+                            humanGoldRef.update(humanMap)
+                        }
+                    }
+
+                }
 
                 }
             }

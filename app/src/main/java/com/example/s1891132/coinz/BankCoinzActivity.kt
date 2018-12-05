@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
-import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -13,10 +12,10 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
-import com.example.s1891132.coinz.AdapterForListView.CoinAdapter
-import com.example.s1891132.coinz.AdapterForListView.RateAdapter
-import com.example.s1891132.coinz.ClassAndItem.Coin
-import com.example.s1891132.coinz.ClassAndItem.RateItem
+import com.example.s1891132.coinz.adapterForListView.CoinAdapter
+import com.example.s1891132.coinz.adapterForListView.RateAdapter
+import com.example.s1891132.coinz.dataClassAndItem.Coin
+import com.example.s1891132.coinz.dataClassAndItem.RateItem
 import kotlinx.android.synthetic.main.activity_bank_coinz.*
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.startActivity
