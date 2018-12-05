@@ -15,7 +15,8 @@
             android:id="@+id/sign_in_coinz_image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:srcCompat="@mipmap/ic_launcher_coinz" />
+            app:srcCompat="@mipmap/ic_launcher_coinz"
+            tools:ignore="ContentDescription" />
 
         <TextView
             android:layout_marginTop="10dp"
@@ -30,8 +31,8 @@
             android:id="@+id/username_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_people_outline_black_24dp"
-            android:hint="  input your email address here"
+            android:drawableStart="@drawable/ic_people_outline_black_24dp"
+            android:hint="@string/email_input"
             android:inputType="textEmailAddress"
             android:nextFocusDown="@id/password_text" />
 
@@ -41,8 +42,8 @@
             android:id="@+id/password_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_business_center_black_24dp"
-            android:hint="  input your password here"
+            android:drawableStart="@drawable/ic_business_center_black_24dp"
+            android:hint="@string/input_password"
             android:inputType="textPassword"
             android:nextFocusDown="@id/signin"/>
 
@@ -54,7 +55,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/roundedbutton"
             android:layout_gravity="center"
-            android:text="Sign in"
+            android:text="@string/sign_in"
             android:textAllCaps="false"/>
 
         <Button
@@ -64,7 +65,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/roundedbutton"
             android:layout_gravity="center"
-            android:text="Register"
+            android:text="@string/register"
             android:textAllCaps="false"/>
 
     </LinearLayout>

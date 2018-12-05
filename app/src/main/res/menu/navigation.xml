@@ -2,19 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/put_into_account"
+        android:id="@+id/coin_I_collect"
         android:icon="@drawable/ic_home_black_24dp"
-        android:title="Coinz You Collect" />
+        android:title="@string/coin_you_collect" />
 
     <item
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/coin_from_friend"
         android:icon="@drawable/ic_people_outline_black_24dp"
-        android:title="Coinz from Friend" />
+        android:title="@string/coin_from_friend" />
 
     <item
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/exchange_gold"
         android:icon="@drawable/ic_notifications_black_24dp"
-        android:title="Exchange Gold" />
+        android:title="@string/exchange_gold" />
 
 
 

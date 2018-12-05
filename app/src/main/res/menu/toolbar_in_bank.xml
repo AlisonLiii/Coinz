@@ -3,6 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/bank_to_main"
-        android:title="Back to Map"
+        android:title="@string/back_to_map"
         app:showAsAction="always"/>
 </menu>

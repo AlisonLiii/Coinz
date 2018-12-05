@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -17,16 +15,16 @@
             android:layout_marginTop="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="My Account"
+            android:text="@string/my_account"
             android:fontFamily="cursive"
-            android:textSize="40dp"
+            android:textSize="40sp"
             android:textAlignment="center" />
 
         <TextView
             android:layout_marginTop="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Your can change your name and bio by clicking on them"
+            android:text="@string/change_bio_name"
             android:textAlignment="center" />
 
         <android.support.design.widget.TextInputEditText
@@ -34,43 +32,43 @@
             android:id="@+id/edit_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_face_black_24dp" />
+            android:drawableStart="@drawable/ic_face_black_24dp" />
 
         <android.support.design.widget.TextInputEditText
             android:layout_marginTop="10dp"
             android:id="@+id/edit_bio"
-            android:hint="introduce yourself a little bit here!"
+            android:hint="@string/introduce"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_extension_black_24dp" />
+            android:drawableStart="@drawable/ic_extension_black_24dp" />
 
         <TextView
             android:layout_marginTop="5dp"
             android:id="@+id/uid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_contacts_black_24dp" />
+            android:drawableStart="@drawable/ic_contacts_black_24dp" />
 
         <TextView
             android:layout_marginTop="10dp"
             android:id="@+id/email_address_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_email_black_24dp" />
+            android:drawableStart="@drawable/ic_email_black_24dp" />
 
         <TextView
             android:layout_marginTop="10dp"
             android:id="@+id/camp_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_people_outline_black_24dp" />
+            android:drawableStart="@drawable/ic_people_outline_black_24dp" />
 
         <TextView
             android:layout_marginTop="10dp"
             android:id="@+id/walking_distance_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_directions_walk_black_24dp" />
+            android:drawableStart="@drawable/ic_directions_walk_black_24dp" />
 
 
         <Button
@@ -80,7 +78,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/roundedbutton"
             android:layout_gravity="center"
-            android:text="Save changes"
+            android:text="@string/save_change"
             android:textAllCaps="false"/>
 
 

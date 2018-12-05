@@ -12,6 +12,7 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.util.Log
 import com.example.s1891132.coinz.userAuthentication.LogInActivity
 import com.example.s1891132.coinz.dataClassAndItem.Coin
+import com.example.s1891132.coinz.fragment.HonorBoardFragment
 import com.example.s1891132.coinz.fragment.MyAccountFragment
 import com.example.s1891132.coinz.fragment.MyPropertyFragment
 import com.example.s1891132.coinz.fragment.PeopleFragment
@@ -84,6 +85,8 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         // Set navigation view navigation item selected listener
         navigation_view.setNavigationItemSelectedListener{
             when (it.itemId){
+                R.id.honor_board->
+                { replaceFragment(HonorBoardFragment()) }
                 R.id.my_account ->
                 { replaceFragment(MyAccountFragment()) }
                 R.id.people -> { replaceFragment(PeopleFragment()) }
@@ -280,6 +283,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {
+        //Click on the marker once to see the info window, click for the second time to make the infowindow invisible
         if(marker.isInfoWindowShown)
         {
             marker.hideInfoWindow()

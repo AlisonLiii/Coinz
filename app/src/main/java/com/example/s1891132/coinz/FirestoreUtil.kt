@@ -102,6 +102,7 @@ object FirestoreUtil {
         }
     }
 
+
     fun updateAccountBalance(peny:Double=0.0,dolr:Double=0.0,shil:Double=0.0,quid:Double=0.0,operation:Int)
     {
         currentUserDocRef.get().addOnSuccessListener { document ->
@@ -146,7 +147,7 @@ object FirestoreUtil {
     }
 
 
-    fun convertToGold(view: View?,type:String,rate:Double){
+    fun convertToGold(view: View?,type:String,rate:Double,name:String){
         currentUserDocRef.get().addOnSuccessListener { document ->
             if (document != null) {
                 var moneyToConvert=0.0
@@ -165,7 +166,8 @@ object FirestoreUtil {
                     val originGold=document["accountGold"] as Double
 
                     val accountGoldMap = mutableMapOf<String, Any>()
-                    val value=moneyToConvert*rate+originGold
+                    val addValue=moneyToConvert*rate
+                    val value=addValue+originGold
                     accountGoldMap["accountGold"]=value
                     currentUserDocRef.update(accountGoldMap)
 
@@ -180,50 +182,61 @@ object FirestoreUtil {
                         updateAccountBalance(0.0,0.0,0.0,moneyToConvert,-1)
 
                     view?.snackbar("Successfully convert!")
-
-                    /*individualGoldRef.get().addOnSuccessListener { document->
-                        if(document!=null)
-                        {
-                            val originIndiGold=document["accountGold"] as Double
-                            if(originIndiGold<value)
-                            {
-                                val indiMap= mutableMapOf<String, Any>()
-                                indiMap["accountGold"]=value
-                                individualGoldRef.update(indiMap)
-                            }
-                        }
-                    }*/
+                    updateGoldForIndividualRanking(individualGoldRef,name,value)
+                    if(document["camp"]==0.0)
+                        updateGoldForCamp(aiGoldRef,addValue)
+                    else
+                        updateGoldForCamp(humanGoldRef,addValue)
                 }
 
-                //TODO:INIT in the app to make it double
-                /*if(document["camp"]==0.0)
-                {
-                    aiGoldRef.get().addOnSuccessListener {document->
-                        if(document!=null)
-                        {
-                            val originAiGold=document["accountGold"] as Double
-                            val aiMap= mutableMapOf<String, Any>()
-                            aiMap["accountGold"]=originAiGold+moneyToConvert*rate
-                            aiGoldRef.update(aiMap)
-                        }
-                    }
-                }
-                else{
-                    humanGoldRef.get().addOnSuccessListener {document->
-                        if(document!=null)
-                        {
-                            val originHumanGold=document["accountGold"] as Double
-                            val humanMap= mutableMapOf<String, Any>()
-                            humanMap["accountGold"]=originHumanGold+moneyToConvert*rate
-                            humanGoldRef.update(humanMap)
-                        }
-                    }
 
-                }*/
 
             }
         }
     }
+
+    private fun updateGoldForIndividualRanking(documentReference: DocumentReference, name:String, gold:Double){
+        val setMap = mutableMapOf<String, Any>()
+
+        documentReference.get().addOnSuccessListener { documentSnapshot ->
+            if (!documentSnapshot.exists()) {
+                setMap["gold"] = gold
+                setMap["name"]=name
+                documentReference.set(setMap)
+            } else {
+                documentReference.get().addOnSuccessListener { document->
+                    val originGold=document["gold"] as Double
+                    if(originGold<gold)
+                    {
+                        setMap["gold"]=gold
+                        setMap["name"]=name
+                        documentReference.update(setMap)
+                    }
+                }
+            }
+        }
+    }
+
+    //update gold for the result of camp confrontation
+    private fun updateGoldForCamp(documentReference: DocumentReference,gold:Double) {
+        val setMap = mutableMapOf<String, Any>()
+
+        documentReference.get().addOnSuccessListener { documentSnapshot ->
+            if (!documentSnapshot.exists()) {
+                setMap["gold"] = gold
+                documentReference.set(setMap)
+            } else {
+                documentReference.get().addOnSuccessListener { document->
+                    val originGold=document["gold"] as Double
+                    setMap["gold"]=gold+originGold
+                    documentReference.update(setMap)
+                }
+
+            }
+        }
+    }
+
+
 
 
     /***

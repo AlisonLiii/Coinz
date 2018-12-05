@@ -1,30 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     >
     <item
         android:id="@+id/my_account"
-        android:title="My Account"
+        android:title="@string/my_account"
         android:icon="@mipmap/my_account"
 
         />
     <item
         android:id="@+id/my_property"
-        android:title="My Properties"
+        android:title="@string/property"
         android:icon="@drawable/ic_account_balance_wallet_black_24dp"
 
         />
     <item
         android:id="@+id/people"
-        android:title="People"
+        android:title="@string/people"
         android:icon="@mipmap/people"
 
         />
 
     <item
+        android:id="@+id/honor_board"
+        android:title="@string/rank_board"
+        android:icon="@drawable/ic_event_note_black_24dp"
+
+        />
+
+    <item
         android:id="@+id/signout"
-        android:title="Sign out"
+        android:title="@string/sign_out"
         android:icon="@drawable/ic_power_settings_new_black_24dp"
 
         />

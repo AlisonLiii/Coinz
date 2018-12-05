@@ -45,7 +45,7 @@
             android:layout_marginEnd="8dp"
             android:layout_toEndOf="@id/fab_send_coin"
             android:elevation="2dp"
-            android:hint="Got somthing to say?"
+            android:hint="@string/something_say"
             android:padding="8dp"
             android:background="@drawable/rect_oval_white"/>
 
@@ -55,7 +55,8 @@
             android:layout_height="36dp"
             android:layout_alignEnd="@id/editText_message"
             android:elevation="2dp"
-            app:srcCompat="@drawable/ic_send_black_24dp" />
+            app:srcCompat="@drawable/ic_send_black_24dp"
+            android:contentDescription="@string/send_message" />
     </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>
