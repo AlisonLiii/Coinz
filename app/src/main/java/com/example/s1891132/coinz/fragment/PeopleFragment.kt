@@ -1,4 +1,4 @@
-package com.example.s1891132.coinz
+package com.example.s1891132.coinz.fragment
 
 
 import android.content.Intent
@@ -10,6 +10,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import com.example.s1891132.coinz.ChatActivity
+import com.example.s1891132.coinz.FirestoreUtil
+import com.example.s1891132.coinz.R
+import com.example.s1891132.coinz.ShareCoinzActivity
 import com.example.s1891132.coinz.dataClassAndItem.PersonItem
 import com.example.s1891132.coinz.message.AppConstants
 import com.google.firebase.firestore.ListenerRegistration
@@ -57,14 +61,13 @@ class PeopleFragment : Fragment() {
                             else {
                                 it.forEach {
                                     val id = it["id"] as String
-                                    FirestoreUtil.getCurrentUser { CoinzUser->
-                                        if(CoinzUser.id!=id)//the target user is not the current user itself
+                                    FirestoreUtil.getCurrentUser { CoinzUser ->
+                                        if (CoinzUser.id != id)//the target user is not the current user itself
                                         {
-                                            val intent= Intent(context, ShareCoinzActivity::class.java)//go to ShareCoinzActivity to share coinz
-                                            intent.putExtra("RecipentID",id)
+                                            val intent = Intent(context, ShareCoinzActivity::class.java)//go to ShareCoinzActivity to share coinz
+                                            intent.putExtra("RecipentID", id)
                                             context?.startActivity(intent)
-                                        }
-                                        else view.snackbar("you cannot search yourself!")
+                                        } else view.snackbar("you cannot search yourself!")
                                     }
                                 }
                             }

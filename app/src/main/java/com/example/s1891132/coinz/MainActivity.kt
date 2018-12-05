@@ -12,6 +12,9 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.util.Log
 import com.example.s1891132.coinz.userAuthentication.LogInActivity
 import com.example.s1891132.coinz.dataClassAndItem.Coin
+import com.example.s1891132.coinz.fragment.MyAccountFragment
+import com.example.s1891132.coinz.fragment.MyPropertyFragment
+import com.example.s1891132.coinz.fragment.PeopleFragment
 import com.firebase.ui.auth.AuthUI
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineListener
@@ -119,7 +122,6 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
 
     override fun onMapReady(mapboxMap: MapboxMap?) {
         map=mapboxMap!!
-        //val view=this.findViewById<View>(android.R.id.content)
         contentView?.longSnackbar("Please wait for some seconds to get your location","OK") {}
         enableLocation()
         //if have files for today, do not need to store

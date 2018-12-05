@@ -1,9 +1,7 @@
 package com.example.s1891132.coinz
 
-import android.content.Context
-import android.content.SharedPreferences
+
 import android.os.AsyncTask
-import android.util.Log
 import java.io.IOException
 import java.io.InputStream
 import java.net.HttpURLConnection
@@ -21,7 +19,7 @@ object DownloadCompleteRunner:DownloadCompleteListener{
     }
 }
 
-class DownloadFileTask(private val caller:DownloadCompleteListener):AsyncTask<String,Void,String>(){//the first String is the input parameter(should be the URL)
+class DownloadFileTask(private val caller:DownloadCompleteListener):AsyncTask<String,Void,String>(){
     override fun doInBackground(vararg urls: String): String=try {
        loadFileFromNetwork(urls[0])
     }catch(e: IOException)
