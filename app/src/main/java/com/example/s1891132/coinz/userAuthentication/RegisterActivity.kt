@@ -14,6 +14,7 @@ import org.jetbrains.anko.design.longSnackbar
 
 class RegisterActivity : AppCompatActivity() {
 
+    private lateinit var dialog:android.app.AlertDialog
     private lateinit var mAuth:FirebaseAuth
     private  var camp:Double=2.0//default value, means nothing. 0.0 means AI, 1.0 means human
 
@@ -24,7 +25,7 @@ class RegisterActivity : AppCompatActivity() {
         mAuth= FirebaseAuth.getInstance()
 
         //choose camp
-        alert("This is a game based on group confrontation. You can choose between two camps: AI and human. The winner camp can rule School of Informatics in University of Edinburgh! "){
+       dialog=alert("This is a game based on group confrontation. You can choose between two camps: AI and human. The winner camp can rule School of Informatics in University of Edinburgh! "){
             title="About the Coinz game..."
             positiveButton("I choose to be AI"){camp=0.0 }
             negativeButton("I choose to be human"){camp=1.0 }
@@ -34,6 +35,8 @@ class RegisterActivity : AppCompatActivity() {
                 it.focusable = View.NOT_FOCUSABLE
             }
         }
+
+
 
         //go back to sign in activity
         back_to_signin.setOnClickListener {
@@ -68,5 +71,10 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    override fun onStop() {
+        super.onStop()
+        dialog.dismiss()
     }
 }

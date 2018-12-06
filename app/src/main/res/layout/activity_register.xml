@@ -55,7 +55,7 @@
             android:drawableStart="@drawable/ic_business_center_black_24dp"
             android:hint="@string/input_password"
             android:nextFocusDown="@id/registersubmit"
-            tools:ignore="TextFields" />
+            android:inputType="textPassword" />
 
         <Button
             android:layout_marginTop="20dp"
