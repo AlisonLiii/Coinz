@@ -9,6 +9,8 @@ import kotlinx.android.synthetic.main.item_person.*
 //this class follows the tutorial below
 //https://www.youtube.com/watch?v=a9I7Ppzh1_Y
 
+
+//PersonItem for chat channel
 class PersonItem(val person: CoinzUser,
                  private val context: Context)
     : Item() {
@@ -22,5 +24,6 @@ class PersonItem(val person: CoinzUser,
             viewHolder.person_camp_item.text=context.getString(R.string.camp_is_human)
     }
 
+    //to show the information on the item layout
     override fun getLayout() = R.layout.item_person
 }

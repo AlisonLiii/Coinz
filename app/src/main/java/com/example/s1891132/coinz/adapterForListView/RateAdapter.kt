@@ -10,6 +10,7 @@ import android.widget.TextView
 import com.example.s1891132.coinz.R
 import com.example.s1891132.coinz.dataClassAndItem.RateItem
 
+//listview adapter to show the rate and the currency type
 class RateAdapter( context: Context,
                   private val dataSource: ArrayList<RateItem>) : BaseAdapter() {
 

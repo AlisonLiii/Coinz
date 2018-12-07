@@ -55,6 +55,7 @@ class LogInActivityTest {
         Thread.sleep(5000)
         intended(hasComponent(MainActivity::class.java.getName()))
 
+
     }
 
    @Test

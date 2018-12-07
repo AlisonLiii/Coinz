@@ -13,4 +13,17 @@ data class CoinzUser(val name:String,val id:String, val email:String,val bio:Str
 
     //bankNum here means how many coins the user collect himself has been banked into the bank account.
     //date here records the date of the day
+    //
+    /*
+     *the class records the name,
+     * id,
+     * email,
+     * self-introduction (bio),
+     * camp(AI or Human, 1.0 stands for human and 0.0 stands for AI)
+     * peny, dolr, shil, quid in the wallet
+     * gold, dolr, peny, shil, quid in the bank account
+     * the date for the information
+     * user's walking distance of the day
+     * how many number of coins user collect himself has been banked into their account
+     */
 }

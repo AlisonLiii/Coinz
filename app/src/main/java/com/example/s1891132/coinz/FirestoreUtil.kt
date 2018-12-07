@@ -1,6 +1,7 @@
 package com.example.s1891132.coinz
 
 import android.content.Context
+import android.support.annotation.VisibleForTesting
 import android.util.Log
 import android.view.View
 import com.example.s1891132.coinz.dataClassAndItem.Coin
@@ -23,7 +24,7 @@ import org.jetbrains.anko.design.snackbar
  */
 
 
-
+@VisibleForTesting
 object FirestoreUtil {
     //using by lazy means the value of firebaseFirestore get instance only upon first access
     val firestoreInstance: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
@@ -103,6 +104,7 @@ object FirestoreUtil {
     }
 
 
+    @VisibleForTesting
     fun updateAccountBalance(peny:Double=0.0,dolr:Double=0.0,shil:Double=0.0,quid:Double=0.0,operation:Int)
     {
         currentUserDocRef.get().addOnSuccessListener { document ->

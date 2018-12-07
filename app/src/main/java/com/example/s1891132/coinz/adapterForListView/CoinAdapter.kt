@@ -16,6 +16,7 @@ import com.example.s1891132.coinz.R
 
 class CoinAdapter(context: Context,private val dataSource: ArrayList<Coin>) : BaseAdapter() {
 
+    //layout inflater
     private val inflater: LayoutInflater
             = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
@@ -23,7 +24,7 @@ class CoinAdapter(context: Context,private val dataSource: ArrayList<Coin>) : Ba
         return dataSource.size
     }
 
-
+    //get the item's position in the list
     override fun getItem(position: Int): Any {
         return dataSource[position]
     }
@@ -44,10 +45,10 @@ class CoinAdapter(context: Context,private val dataSource: ArrayList<Coin>) : Ba
         val coin = getItem(position) as Coin
         curtypeTextView.text = coin.type
         curvalueTextView.text=coin.value.toString()
-
         return rowView
     }
 
+    //remove the coin after banking into its account/sharing it to user's friend
     fun remove(postion:Int)
     {
         dataSource.removeAt(postion)

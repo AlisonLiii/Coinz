@@ -1,8 +1,10 @@
 package com.example.s1891132.coinz
 
+import android.support.annotation.VisibleForTesting
 import android.util.Log
 import java.util.*
 
+@VisibleForTesting
 fun currentDate():String {
     val calendar=Calendar.getInstance()
     val year=calendar.get(Calendar.YEAR).toString()
@@ -13,7 +15,7 @@ fun currentDate():String {
     if(day.toInt()<10)
         day= "0$day"
 
-    Log.i("testDate","$year/$month/$day")
+    //Log.i("testDate","$year/$month/$day")
     return "$year/$month/$day"
 }
 fun currentUrl():String{
