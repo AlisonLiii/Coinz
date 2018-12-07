@@ -66,7 +66,7 @@ class BankCoinzActivity : AppCompatActivity() {
                                             else{
                                                 //update bank account balance
                                                 val coin=coinSelfCollectList[position]
-                                                if(coin.type.equals("PENY",true))
+                                                /*if(coin.type.equals("PENY",true))
                                                     FirestoreUtil.updateAccountBalance(coin.value,0.0,0.0,0.0,1)
                                                 else if(coin.type.equals("DOLR",true))
                                                     FirestoreUtil.updateAccountBalance(0.0,coin.value,0.0,0.0,1)
@@ -75,7 +75,8 @@ class BankCoinzActivity : AppCompatActivity() {
                                                 else if(coin.type.equals("QUID",true))
                                                     FirestoreUtil.updateAccountBalance(0.0,0.0,0.0,coin.value,1)
                                                 else
-                                                    Log.d("coinz","Invalid opeartion")
+                                                    Log.d("coinz","Invalid opeartion")*/
+                                                updateBalance(coin.type,coin.value)
                                                 FirestoreUtil.updateBankNumToday()
                                                 FirestoreUtil.deleteCoinInList(FirestoreUtil.coinSelfCollectListRef,coin.id)
                                                 adapter.remove(position)//remove the coin in the listview
@@ -112,7 +113,8 @@ class BankCoinzActivity : AppCompatActivity() {
                                 listView.visibility=View.VISIBLE
                                 listView.onItemClickListener = AdapterView.OnItemClickListener{adapterView, view, position, id->
                                     val coin=coinFromFreindsList[position]
-                                    if(coin.type.equals("PENY",true))
+                                    updateBalance(coin.type,coin.value)
+                                    /*if(coin.type.equals("PENY",true))
                                         FirestoreUtil.updateAccountBalance(coin.value,0.0,0.0,0.0,1)
                                     else if(coin.type.equals("DOLR",true))
                                         FirestoreUtil.updateAccountBalance(0.0,coin.value,0.0,0.0,1)
@@ -121,7 +123,7 @@ class BankCoinzActivity : AppCompatActivity() {
                                     else if(coin.type.equals("QUID",true))
                                         FirestoreUtil.updateAccountBalance(0.0,0.0,0.0,coin.value,1)
                                     else
-                                        Log.d("coinz","Invalid opeartion")
+                                        Log.d("coinz","Invalid opeartion")*/
                                     FirestoreUtil.deleteCoinInList(FirestoreUtil.coinFromOthersRef,coin.id)
                                     adapter.remove(position)
                                 }
@@ -194,4 +196,32 @@ class BankCoinzActivity : AppCompatActivity() {
         return true
     }
 
+
+    private fun updateBalance(type:String,value:Double){
+        if(type.equals("PENY",true))
+        {
+            FirestoreUtil.updateAccountBalance(value,0.0,0.0,0.0,1)
+            FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,value,0.0,0.0,0.0,-1)
+        }
+        else if(type.equals("DOLR",true))
+        {
+            FirestoreUtil.updateAccountBalance(0.0,value,0.0,0.0,1)
+            FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,0.0,value,0.0,0.0,-1)
+        }
+        else if(type.equals("SHIL",true))
+        {
+            FirestoreUtil.updateAccountBalance(0.0,0.0,value,0.0,1)
+            FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,0.0,0.0,value,0.0,-1)
+        }
+        else if(type.equals("QUID",true))
+        {
+            FirestoreUtil.updateAccountBalance(0.0,0.0,0.0,value,1)
+            FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,0.0,0.0,0.0,value,-1)
+        }
+
+        else
+            Log.d("coinz","Invalid opeartion")
+    }
+
 }
+

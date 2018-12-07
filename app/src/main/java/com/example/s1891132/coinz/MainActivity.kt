@@ -1,21 +1,22 @@
 package com.example.s1891132.coinz
 
-import android.support.v4.app.Fragment
 import android.content.Context
 import android.content.SharedPreferences
 import android.location.Location
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.support.annotation.VisibleForTesting
+import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import com.example.s1891132.coinz.userAuthentication.LogInActivity
 import com.example.s1891132.coinz.dataClassAndItem.Coin
 import com.example.s1891132.coinz.fragment.HonorBoardFragment
 import com.example.s1891132.coinz.fragment.MyAccountFragment
 import com.example.s1891132.coinz.fragment.MyPropertyFragment
 import com.example.s1891132.coinz.fragment.PeopleFragment
+import com.example.s1891132.coinz.userAuthentication.LogInActivity
 import com.firebase.ui.auth.AuthUI
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineListener
@@ -39,8 +40,10 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
 import kotlinx.android.synthetic.main.activity_main.*
-import org.jetbrains.anko.*
+import org.jetbrains.anko.contentView
 import org.jetbrains.anko.design.longSnackbar
+import org.jetbrains.anko.longToast
+import org.jetbrains.anko.startActivity
 import java.util.*
 
 class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineListener, OnMapReadyCallback,MapboxMap.OnMarkerClickListener {
