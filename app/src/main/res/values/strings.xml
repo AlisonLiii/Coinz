@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_name">Coinz</string>
     <string name="app_name_coinz">Coinz</string>
     <string name="access_token">pk.eyJ1IjoibGl6enlsZWUyMzMiLCJhIjoiY2ptdzZmZHRyMGNxNDNrbzFkMGxqYXR6aiJ9.ruIjA_TsqMFDcsib8I5rUA</string>
 
@@ -56,8 +57,8 @@
     <string name="chat">Click and chat</string>
     <string name="title_for_rate">Text for rates</string>
     <string name="back_to_map">Back to Map</string>
-    <string name="coin_you_collect">Coinz You Collect</string>
-    <string name="coin_from_friend">Coinz from Friend</string>
+    <string name="coin_you_collect">Coinz You Collect </string>
+    <string name="coin_from_friend">Coinz from Friend </string>
     <string name="exchange_gold">Exchange Gold</string>
     <string name="sign_out">Sign out</string>
     <string name="property">My Properties</string>
@@ -73,4 +74,7 @@
     <string name="game_description">One day, AI Robots in the Informatics laboratories wake up with their own sense and decide to conquer Informatics Forum as their first base of invading Earth! You can choose between two camps: AI and human. The winner camp can rule School of Informatics for the moment! All you need to do is to collect as much as coins and gold you have!</string>
     <string name="email">user\'s email:</string>
     <string name="rate_text">rate of the day</string>
+    <string name="in_your_account">in your bank account</string>
+    <string name="from_wallet_to_account">Bank into Account!</string>
+    <string name="share_to_friend">Share!</string>
 </resources>

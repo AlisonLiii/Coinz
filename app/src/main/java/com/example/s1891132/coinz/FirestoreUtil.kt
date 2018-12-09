@@ -35,7 +35,7 @@ object FirestoreUtil {
 
     //Collection reference of the coins list that contains coinz user himself collect
     val coinSelfCollectListRef: CollectionReference
-        get()= currentUserDocRef.collection("coinListForTheDay")
+        get()= currentUserDocRef.collection("coinSelfCollectForTheDay")
 
     //Collection reference of the coins list that contains coinz user receive from others
     val coinFromOthersRef: CollectionReference

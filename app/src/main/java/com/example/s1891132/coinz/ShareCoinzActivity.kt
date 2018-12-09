@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
 import com.example.s1891132.coinz.adapterForListView.CoinAdapter
+import com.example.s1891132.coinz.adapterForListView.CoinShareAdapter
 import com.example.s1891132.coinz.dataClassAndItem.Coin
 import kotlinx.android.synthetic.main.activity_share_coinz.*
 import org.jetbrains.anko.contentView
@@ -47,7 +48,7 @@ class ShareCoinzActivity : AppCompatActivity() {
                             coinList.add(coin)
                         }
 
-                        val adapter= CoinAdapter(this, coinList)//ListView adapter
+                        val adapter= CoinShareAdapter(this, coinList)//ListView adapter
                         listView.adapter = adapter
                         listView.onItemClickListener = AdapterView.OnItemClickListener{ _, view, position, _ ->
                             val coin=coinList[position]

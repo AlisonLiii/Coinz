@@ -71,6 +71,7 @@ class BankCoinzActivity : AppCompatActivity() {
                                                 FirestoreUtil.updateBankNumToday()
                                                 FirestoreUtil.deleteCoinInList(FirestoreUtil.coinSelfCollectListRef,coin.id)
                                                 adapter.remove(position)//remove the coin in the listview
+                                                contentView?.snackbar("Successfully bank!")
                                             }
 
                                         }
@@ -107,6 +108,7 @@ class BankCoinzActivity : AppCompatActivity() {
                                     updateBalance(coin.type,coin.value)
                                     FirestoreUtil.deleteCoinInList(FirestoreUtil.coinFromOthersRef,coin.id)
                                     adapter.remove(position)
+                                    contentView?.snackbar("Successfully bank!")
                                 }
                             }
                         }
