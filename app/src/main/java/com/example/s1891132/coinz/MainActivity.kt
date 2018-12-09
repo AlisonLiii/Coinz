@@ -61,6 +61,8 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
     private var downloadMap: DownloadFileTask=DownloadFileTask(DownloadCompleteRunner)
     private var coinzFile="CoinzGeoInfoToday"
 
+
+    @VisibleForTesting
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -126,6 +128,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
 
     }
 
+    @VisibleForTesting
     override fun onMapReady(mapboxMap: MapboxMap?) {
         map=mapboxMap!!
         contentView?.longSnackbar("Please wait for some seconds to get your location","OK") {}
@@ -147,7 +150,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         }
     }
 
-
+    @VisibleForTesting
     //store information in shared preference file
     private fun storeCoinz(data:String?){
         val editor=getSharedPreferences(coinzFile, Context.MODE_PRIVATE).edit()

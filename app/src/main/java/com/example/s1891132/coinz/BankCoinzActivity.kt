@@ -1,5 +1,6 @@
 package com.example.s1891132.coinz
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -55,7 +56,7 @@ class BankCoinzActivity : AppCompatActivity() {
                                 val adapter= CoinAdapter(this, coinSelfCollectList)
                                 listView.adapter = adapter
                                 listView.visibility=View.VISIBLE
-                                listView.onItemClickListener = AdapterView.OnItemClickListener{adapterView, view, position, id->
+                                listView.onItemClickListener = AdapterView.OnItemClickListener{ _, view, position, _->
                                     FirestoreUtil.currentUserDocRef.get().addOnSuccessListener { document->
                                         if(document!=null)
                                         {
@@ -101,7 +102,7 @@ class BankCoinzActivity : AppCompatActivity() {
                                 val adapter= CoinAdapter(this, coinFromFreindsList)
                                 listView.adapter = adapter
                                 listView.visibility=View.VISIBLE
-                                listView.onItemClickListener = AdapterView.OnItemClickListener{adapterView, view, position, id->
+                                listView.onItemClickListener = AdapterView.OnItemClickListener{_, _, position, _->
                                     val coin=coinFromFreindsList[position]
                                     updateBalance(coin.type,coin.value)
                                     FirestoreUtil.deleteCoinInList(FirestoreUtil.coinFromOthersRef,coin.id)
@@ -131,11 +132,11 @@ class BankCoinzActivity : AppCompatActivity() {
                 val adapter= RateAdapter(this, rateList)
                 listView.adapter = adapter
 
-                listView.onItemClickListener=AdapterView.OnItemClickListener{adapterView, view, position, id->
+                listView.onItemClickListener=AdapterView.OnItemClickListener{ _, _, position, _->
 
                     val rateItem=rateList[position]
                     FirestoreUtil.getCurrentUser {
-                        FirestoreUtil.convertToGold(contentView,rateItem.type,rateItem.rate,it.name)
+                        FirestoreUtil.convertToGold(contentView,rateItem.type,rateItem.rate,it.email)
                     }
                 }
                 return@OnNavigationItemSelectedListener true
@@ -145,6 +146,7 @@ class BankCoinzActivity : AppCompatActivity() {
     }
 
 
+    @SuppressLint("VisibleForTests")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bank_coinz)

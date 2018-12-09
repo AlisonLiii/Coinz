@@ -1,7 +1,5 @@
 package com.example.s1891132.coinz.fragment
 
-
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.TextInputEditText

@@ -1,6 +1,7 @@
 package com.example.s1891132.coinz
 
 import android.content.Context
+import android.support.annotation.VisibleForTesting
 import android.util.Log
 import android.view.View
 import com.example.s1891132.coinz.dataClassAndItem.Coin
@@ -62,6 +63,7 @@ object FirestoreUtil {
 
     //Initialise the user profile in Firestore when he/she first sign in;
     // if he/she has signed in before on another device, this method would not call
+    @VisibleForTesting
     fun initCurrentUserIfFirstTime(name:String,camp:Double, onComplete: () -> Unit) {
         currentUserDocRef.get().addOnSuccessListener { documentSnapshot ->
             if (!documentSnapshot.exists()) {//Create user profile if the user's profile doesn't exist before
@@ -146,7 +148,7 @@ object FirestoreUtil {
     }
 
 
-    fun convertToGold(view: View?,type:String,rate:Double,name:String){
+    fun convertToGold(view: View?,type:String,rate:Double,email:String){
         currentUserDocRef.get().addOnSuccessListener { document ->
             if (document != null) {
                 var moneyToConvert=0.0
@@ -181,7 +183,7 @@ object FirestoreUtil {
                         updateAccountBalance(0.0,0.0,0.0,moneyToConvert,-1)
 
                     view?.snackbar("Successfully convert!")
-                    updateGoldForIndividualRanking(individualGoldRef,name,value)
+                    updateGoldForIndividualRanking(individualGoldRef,email,value)
                     if(document["camp"]==0.0)
                         updateGoldForCamp(aiGoldRef,addValue)
                     else
@@ -194,13 +196,13 @@ object FirestoreUtil {
         }
     }
 
-    private fun updateGoldForIndividualRanking(documentReference: DocumentReference, name:String, gold:Double){
+    private fun updateGoldForIndividualRanking(documentReference: DocumentReference, email:String, gold:Double){
         val setMap = mutableMapOf<String, Any>()
 
         documentReference.get().addOnSuccessListener { documentSnapshot ->
             if (!documentSnapshot.exists()) {
                 setMap["gold"] = gold
-                setMap["name"]=name
+                setMap["email"]=email
                 documentReference.set(setMap)
             } else {
                 documentReference.get().addOnSuccessListener { document->
@@ -208,7 +210,7 @@ object FirestoreUtil {
                     if(originGold<gold)
                     {
                         setMap["gold"]=gold
-                        setMap["name"]=name
+                        setMap["email"]=email
                         documentReference.update(setMap)
                     }
                 }

@@ -25,7 +25,9 @@ class RegisterActivity : AppCompatActivity() {
         mAuth= FirebaseAuth.getInstance()
 
         //choose camp
-       dialog=alert("This is a game based on group confrontation. You can choose between two camps: AI and human. The winner camp can rule School of Informatics in University of Edinburgh! "){
+
+        //get the description of the game in alert dialog
+       dialog=alert(getString(R.string.game_description)){
             title="About the Coinz game..."
             positiveButton("I choose to be AI"){camp=0.0 }
             negativeButton("I choose to be human"){camp=1.0 }

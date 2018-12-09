@@ -35,7 +35,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="fontFamily" value="Andale Mono" />
-                                                <entry key="text" value="Quid" />
+                                                <entry key="text" value="ID" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -46,7 +46,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="TEXT" />
-                                      <entry key="outputName" value="ic_quid_text" />
+                                      <entry key="outputName" value="ic_id_text" />
                                       <entry key="theme" value="CUSTOM" />
                                       <entry key="themeColor" value="000000" />
                                     </map>

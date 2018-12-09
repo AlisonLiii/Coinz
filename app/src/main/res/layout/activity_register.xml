@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:gravity="center"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:orientation="vertical">
 
         <ImageView
             android:id="@+id/register_coinz_image"
@@ -23,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="cursive"
-            android:text="@string/app_name"
+            android:text="@string/app_name_coinz"
             android:textAlignment="center" />
 
         <EditText
@@ -77,7 +74,6 @@
             android:text="@string/back_to_sign_in"
             android:textAllCaps="false"/>
 
-    </LinearLayout>
 
 
-</RelativeLayout>
+</LinearLayout>

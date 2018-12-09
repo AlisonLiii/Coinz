@@ -43,7 +43,7 @@ class HonorBoardFragment : Fragment() {
             if(document.exists())
             {
                 val individualGold=document["gold"] as Double
-                val individualName=document["name"]
+                val individualName=document["email"]
                 gold_indi_honor.text=individualGold.toString()
                 user_name_honor.text=individualName.toString()
             }
