@@ -131,7 +131,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
     @VisibleForTesting
     override fun onMapReady(mapboxMap: MapboxMap?) {
         map=mapboxMap!!
-        contentView?.longSnackbar("Please wait for some seconds to get your location","OK") {}
+        contentView?.longSnackbar("Please wait for some seconds to get your location. After that, click on the nearby coinz! ","OK") {}
         enableLocation()
         //if have files for today, do not need to store
         if(downloadCoin=="No GeoJson for today"){
@@ -279,6 +279,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
            if(::originLocation.isInitialized)
            {
                walkingDistance+=originLocation.distanceTo(location).toDouble()
+
            }
            originLocation=location
            FirestoreUtil.updateWalkingDistance(walkingDistance)

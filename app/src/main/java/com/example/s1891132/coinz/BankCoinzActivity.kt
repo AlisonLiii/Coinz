@@ -118,7 +118,7 @@ class BankCoinzActivity : AppCompatActivity() {
                 hint_bank.visibility=View.INVISIBLE
                 listView.visibility=View.VISIBLE
                 hint_no_coin_bank.visibility=View.INVISIBLE
-
+                contentView?.snackbar("Here you can convert the balance for each type of currency in your bank account to gold.")
                 //parse GeoJson information in the shared preference file to get the rate
                 val jsonObject= JSONObject(coinInfo)
                 val jsonRate=jsonObject.getJSONObject("rates")
