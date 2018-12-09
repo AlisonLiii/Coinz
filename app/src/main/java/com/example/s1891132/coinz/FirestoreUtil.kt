@@ -1,7 +1,6 @@
 package com.example.s1891132.coinz
 
 import android.content.Context
-import android.support.annotation.VisibleForTesting
 import android.util.Log
 import android.view.View
 import com.example.s1891132.coinz.dataClassAndItem.Coin
@@ -24,7 +23,6 @@ import org.jetbrains.anko.design.snackbar
  */
 
 
-@VisibleForTesting
 object FirestoreUtil {
     //using by lazy means the value of firebaseFirestore get instance only upon first access
     val firestoreInstance: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
@@ -104,7 +102,6 @@ object FirestoreUtil {
     }
 
 
-    @VisibleForTesting
     fun updateAccountBalance(peny:Double=0.0,dolr:Double=0.0,shil:Double=0.0,quid:Double=0.0,operation:Int)
     {
         currentUserDocRef.get().addOnSuccessListener { document ->
@@ -375,7 +372,6 @@ object FirestoreUtil {
      */
     fun newDayUpdateOrNot()
     {
-        //TODO:NOTICE BOARD UPDATE
         getCurrentUser { CoinzUser ->
             if(CoinzUser.date!= currentDate())
             {
@@ -388,17 +384,11 @@ object FirestoreUtil {
                        coinSelfCollectListRef.document(document.id).delete()
                     }
                 }
-                coinFromOthersRef.get().addOnSuccessListener{documents->
-                    for(document in documents){
-                        coinFromOthersRef.document(document.id).delete()
-                    }
-                }
                 markerRef.get().addOnSuccessListener{documents->
                     for(document in documents){
                         markerRef.document(document.id).delete()
                     }
                 }
-
                 //update the information of the new day
                 val userFileMap= mutableMapOf<String,Any>()
                 userFileMap["date"]= currentDate()
