@@ -24,6 +24,12 @@ import org.junit.runner.RunWith
 
 class LogInActivityTest {
 
+    /*Include three tests
+    1) When the input of the username and password is empty
+    2) When the input of the password is wrong
+    3) When the input of the password is correct, the user will be directed to MainActivity
+    */
+
     @Rule
     @JvmField
     val rule  = IntentsTestRule(LogInActivity::class.java)
@@ -32,6 +38,7 @@ class LogInActivityTest {
     private val useremail="test1@gmail.com"//where to put grant permission rule
     private val correctpassword ="testtest"
     private val wrongpassword = "wrongpassword"
+
 
 
     //test if the input is empty
