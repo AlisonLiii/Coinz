@@ -10,8 +10,6 @@ import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.GrantPermissionRule
 import android.support.test.runner.AndroidJUnit4
 import android.util.Log
-import com.example.s1891132.coinz.MainActivity
-import com.example.s1891132.coinz.R
 import com.example.s1891132.coinz.userAuthentication.LogInActivity
 import org.junit.Rule
 import org.junit.Test

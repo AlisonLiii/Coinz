@@ -119,7 +119,7 @@ public class RegisterFailureTest {
                 allOf(withId(R.id.snackbar_text), withText("Failed.The email address may have been registered or is not in valid format, or the password is too easy  "),
                         childAtPosition(
                                 childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.FrameLayout.class),
+                                        IsInstanceOf.instanceOf(android.widget.FrameLayout.class),
                                         0),
                                 0),
                         isDisplayed()));
@@ -203,7 +203,7 @@ public class RegisterFailureTest {
                 allOf(withId(R.id.snackbar_text), withText("Failed.The email address may have been registered or is not in valid format, or the password is too easy  "),
                         childAtPosition(
                                 childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.FrameLayout.class),
+                                        IsInstanceOf.instanceOf(android.widget.FrameLayout.class),
                                         0),
                                 0),
                         isDisplayed()));
@@ -287,7 +287,7 @@ public class RegisterFailureTest {
                 allOf(withId(R.id.snackbar_text), withText("Failed.The email address may have been registered or is not in valid format, or the password is too easy  "),
                         childAtPosition(
                                 childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.FrameLayout.class),
+                                        IsInstanceOf.instanceOf(android.widget.FrameLayout.class),
                                         0),
                                 0),
                         isDisplayed()));

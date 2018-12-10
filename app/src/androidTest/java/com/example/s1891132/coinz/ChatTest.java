@@ -85,7 +85,7 @@ public class ChatTest {
         }
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -113,7 +113,7 @@ public class ChatTest {
         navigationMenuItemView.perform(click());
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -137,7 +137,7 @@ public class ChatTest {
         recyclerView.perform(actionOnItemAtPosition(0, click()));
 
         try {
-            Thread.sleep(500);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -185,7 +185,7 @@ public class ChatTest {
                         childAtPosition(
                                 allOf(withId(R.id.toolbar_share),
                                         childAtPosition(
-                                                IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class),
+                                                IsInstanceOf.instanceOf(android.view.ViewGroup.class),
                                                 0)),
                                 0),
                         isDisplayed()));
