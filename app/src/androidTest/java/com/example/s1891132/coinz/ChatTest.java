@@ -42,7 +42,8 @@ public class ChatTest {
     @Rule
     public GrantPermissionRule grantPermissionRule=GrantPermissionRule .grant(android.Manifest.permission.ACCESS_FINE_LOCATION);
 
-    /*To test :
+    /*ONE TEST:
+    To test :
     1)whether registered players are displayed to the user in the People Fragment
     2)whether message can be sent from users
     3)whether user can go to ShareCoinzActivity after clicking on the lower left button on the chat page

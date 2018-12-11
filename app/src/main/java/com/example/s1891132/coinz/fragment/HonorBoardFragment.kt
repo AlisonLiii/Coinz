@@ -20,9 +20,10 @@ class HonorBoardFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        //If the first user of the app check the honor board, it will show not initialize on the gold value,
+        //If the first user of the app check the honor board, it will show "not initialize" on the gold value,
         //because no one has any gold at the moment
 
+        //to show the gold of the AI camp
         FirestoreUtil.aiGoldRef.get().addOnSuccessListener { document->
             if(document.exists())
             {
@@ -30,6 +31,8 @@ class HonorBoardFragment : Fragment() {
                 honor_ai.text=aiGold.toString()
             }
         }
+
+        //to show the gold of the human camp
         FirestoreUtil.humanGoldRef.get().addOnSuccessListener { document->
             if(document.exists())
             {
@@ -39,6 +42,7 @@ class HonorBoardFragment : Fragment() {
 
         }
 
+        //to show the information of  individual No.1
         FirestoreUtil.individualGoldRef.get().addOnSuccessListener { document->
             if(document.exists())
             {

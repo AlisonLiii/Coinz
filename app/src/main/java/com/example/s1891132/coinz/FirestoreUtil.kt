@@ -44,16 +44,23 @@ object FirestoreUtil {
     //Collection reference of the marker information list that contains coinz user himself has collected
     val markerRef: CollectionReference
         get()= currentUserDocRef.collection("markerForTheDay")
+    /*the difference between markerRef and coinSelfCollectListRef is that:
+    * when user share the coinz to others, the coinz will not be deleted in markerRef but will be deleted in coinSelfCollectListRef
+    * and the marker of that coinz will not be displayed on the map the next time user launch the app.
+     */
 
 
+    //Document reference that stores the total gold of the camp AI
     val aiGoldRef:DocumentReference
         get() =  firestoreInstance.collection("ForRanking").document("AI")
+    //Document reference that stores the total gold of the camp Human
     val humanGoldRef:DocumentReference
         get() =  firestoreInstance.collection("ForRanking").document("Human")
+    //Document reference that stores the highest value of gold of individual
     val individualGoldRef:DocumentReference
         get() =  firestoreInstance.collection("ForRanking").document("IndividualGold")
 
-
+    //collection reference to chatchannel
     private val chatChannelsCollectionRef = firestoreInstance.collection("chatChannels")
 
 
@@ -76,6 +83,7 @@ object FirestoreUtil {
         }
     }
 
+    //The method is actually called by a class under MyAccountFragment
     fun updateCurrentUserProfile(name:String="",bio:String="")
     {
         val userFiledMap= mutableMapOf<String,Any>()
@@ -97,7 +105,7 @@ object FirestoreUtil {
             {
                 val originBankNum=document["bankNum"] as Double
                 val bankNumMap= mutableMapOf<String,Any>()
-                bankNumMap["bankNum"]=originBankNum+1.0
+                bankNumMap["bankNum"]=originBankNum+1.0 //user can only bank a coin at a time and it will be recorded right away
                 currentUserDocRef.update(bankNumMap)
             }
         }
@@ -151,7 +159,8 @@ object FirestoreUtil {
     fun convertToGold(view: View?,type:String,rate:Double,email:String){
         currentUserDocRef.get().addOnSuccessListener { document ->
             if (document != null) {
-                var moneyToConvert=0.0
+                var moneyToConvert: Double
+
                 if(type.equals("SHIL",true))
                     moneyToConvert=document["accountShil"] as Double
                 else if (type.equals("PENY",true))
@@ -164,8 +173,8 @@ object FirestoreUtil {
                 if(moneyToConvert<=0.0)
                     view?.snackbar("You don't have coinz of that type to convert in your account!")
                 else{
-                    val originGold=document["accountGold"] as Double
 
+                    val originGold=document["accountGold"] as Double
                     val accountGoldMap = mutableMapOf<String, Any>()
                     val addValue=moneyToConvert*rate
                     val value=addValue+originGold
@@ -183,7 +192,11 @@ object FirestoreUtil {
                         updateAccountBalance(0.0,0.0,0.0,moneyToConvert,-1)
 
                     view?.snackbar("Successfully convert!")
+
+                    //update information for individual ranking because the value of gold has changed
                     updateGoldForIndividualRanking(individualGoldRef,email,value)
+
+                    //update information for camp ranking because the value of gold has changed
                     if(document["camp"]==0.0)
                         updateGoldForCamp(aiGoldRef,addValue)
                     else
@@ -196,6 +209,7 @@ object FirestoreUtil {
         }
     }
 
+    //update inidividual ranking based on the gold in his account
     private fun updateGoldForIndividualRanking(documentReference: DocumentReference, email:String, gold:Double){
         val setMap = mutableMapOf<String, Any>()
 
@@ -380,12 +394,13 @@ object FirestoreUtil {
                 //zero out user's wallet
                 updateWalletBalance(currentUserDocRef,0.0,0.0,0.0,0.0,0)
 
-                //delete all the coinz
+                //delete all the coinz that user collect himself, but not zero out the coinz from friends
                 coinSelfCollectListRef.get().addOnSuccessListener{documents->
                     for(document in documents){
                        coinSelfCollectListRef.document(document.id).delete()
                     }
                 }
+                //zero out the marker list of yesterday
                 markerRef.get().addOnSuccessListener{documents->
                     for(document in documents){
                         markerRef.document(document.id).delete()
@@ -437,6 +452,7 @@ object FirestoreUtil {
     /**
      *Chatting pattern
      ***/
+    //The below methods are actually called in ChatActivity, but AS still gives warnings
 
     fun getOrCreateChatChannel(otherUserId: String,
                                onComplete: (channelId: String) -> Unit) {
@@ -466,6 +482,7 @@ object FirestoreUtil {
                 }
     }
 
+    //Listen to the chat messages
     fun addChatMessagesListener(channelId: String, context: Context,
                                 onListen: (List<Item>) -> Unit): ListenerRegistration {
         return chatChannelsCollectionRef.document(channelId).collection("messages")

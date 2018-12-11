@@ -13,6 +13,7 @@
     app:cardCornerRadius="4dp"
     app:cardElevation="4dp">
 
+    <!-- the adapter for recycler view of people -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

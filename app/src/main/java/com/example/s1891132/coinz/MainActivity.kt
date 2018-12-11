@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
                             .signOut(this)
                             .addOnCompleteListener {
                                 longToast("sign out successfully, now return to the log in page")
-                                startActivity<LogInActivity>()}
+                                startActivity<LogInActivity>()} //after signing out, user need to go to LogInActivity to log in
                 }
             }
             // Close the drawer
@@ -123,19 +123,20 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         {
             downloadMap.execute(currentUrl())//download today's GeoJson information from the server
         }
-        FirestoreUtil.newDayUpdateOrNot()//zero out wallet balance, coinz and walking distance if it is a new day
+        FirestoreUtil.newDayUpdateOrNot()//zero out wallet balance, coinz the user collect himself and walking distance if it is a new day
         mapView.getMapAsync(this)
 
     }
+
 
     @VisibleForTesting
     override fun onMapReady(mapboxMap: MapboxMap?) {
         map=mapboxMap!!
         contentView?.longSnackbar("Please wait for some seconds to get your location. After that, click on the nearby coinz! ","OK") {}
         enableLocation()
-        //if have files for today, do not need to store
+        //store the GeoJson downloaded in shared preference file if there is no info of the day in sharedPreference file
         if(downloadCoin=="No GeoJson for today"){
-            storeCoinz(DownloadCompleteRunner.result)//store the GeoJson downloaded in shared preference file
+            storeCoinz(DownloadCompleteRunner.result)
         }
         downloadCoin=settings.getString(currentDate(),"")//get GeoJson information of the day from shared preference file
         parseGeoJson(downloadCoin)//parse GeoJson information to add markers
@@ -145,7 +146,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
     private fun replaceFragment(fragment: Fragment){
         supportFragmentManager.beginTransaction().apply{
             replace(R.id.fragment_frame,fragment)
-            addToBackStack(null)//this enables user to press the Back button on the phone and return to the main screen
+            addToBackStack(null)//this enables user to press the Back button on the phone and return to the previous screen
             commit()
         }
     }
@@ -154,7 +155,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
     //store information in shared preference file
     private fun storeCoinz(data:String?){
         val editor=getSharedPreferences(coinzFile, Context.MODE_PRIVATE).edit()
-        editor.putString(currentDate(),data)
+        editor.putString(currentDate(),data)//the key of the key-value pair in sharedpreference file is the current date
         editor.apply()
     }
 
@@ -174,6 +175,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
         }
         else{
 
+            //extract GeoJson information of the day
             val featureCollection=FeatureCollection.fromJson(data)
             val features:List<Feature>?=featureCollection.features()
             if(features==null)
@@ -186,7 +188,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
                     val point=fc.geometry()as Point
                     val latlng=LatLng(point.latitude(),point.longitude())
                     val curtype=fc.properties()!!.getAsJsonPrimitive("currency").toString().replace("\"", "")
-                    //use .replace to remove the quotation mark of the String
+                    //use .replace to remove the quotation mark of the original string
                     val id=fc.properties()!!.getAsJsonPrimitive("id").toString().replace("\"", "")//or int
                     val curvalue=fc.properties()!!.getAsJsonPrimitive("value").toString().replace("\"", "")
                     val coin= Coin(id, curtype, curvalue.toDouble(), latlng)
@@ -286,11 +288,12 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
            setCameraPosition(location)
        }
 
-        map.setOnMarkerClickListener(this)
+        map.setOnMarkerClickListener(this)//after getting the user's current location, the marker can be clicked to collect
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {
-        //Click on the marker once to see the info window, click for the second time to make the infowindow invisible
+        //Click on the marker once to see the info window,
+        //Click for the second time to make the infowindow invisible
         if(marker.isInfoWindowShown)
         {
             marker.hideInfoWindow()
@@ -307,7 +310,7 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
                     {
                         if(it.type.equals("PENY",true))
                             FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,it.value,0.0,0.0,0.0,1)
-                        //operation:1 means adding coins
+                        //operation:the number 1 here means adding coins
                         else if(it.type.equals("DOLR",true))
                             FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,0.0,it.value,0.0,0.0,1)
                         else if(it.type.equals("SHIL",true))
@@ -316,13 +319,14 @@ class MainActivity : AppCompatActivity() , PermissionsListener, LocationEngineLi
                             FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,0.0,0.0,0.0,it.value,1)
                         else
                             Log.d("coinz","Invalid type of coinz")
+                        //record the coins that user have collected himself
                         FirestoreUtil.addCoinInList(FirestoreUtil.coinSelfCollectListRef,it)
                         //record the markers that need to be removed the next time user open the app
                         FirestoreUtil.addCoinInList(FirestoreUtil.markerRef,it)
                     }
                 }
                 contentView?.longSnackbar("Successfully collect a coin!")
-                marker.remove()
+                marker.remove()//remove the marker after collecting
             }
             else contentView?.longSnackbar("Please get closer!")
         }

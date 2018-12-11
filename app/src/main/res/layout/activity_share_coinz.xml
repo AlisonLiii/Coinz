@@ -15,6 +15,7 @@
         android:elevation="4dp"
         android:fitsSystemWindows="true" />
 
+    <!-- a textview to tell people no coinz left -->
     <TextView
         android:id="@+id/no_coinz_share"
         android:layout_width="wrap_content"

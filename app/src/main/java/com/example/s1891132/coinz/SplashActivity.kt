@@ -12,9 +12,13 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
+        //if the user has never logged in or has signed out before, the currentUser instance will be null
+        //and we go to LogInActivity
         if(FirebaseAuth.getInstance().currentUser==null)
             startActivity<LogInActivity>()
         else
+        //if the user has logged in and hasn't signed out before
+        //and we go directly to MainActivity
             startActivity<MainActivity>()//you don't have to log in every time you open the app
         finish()
     }

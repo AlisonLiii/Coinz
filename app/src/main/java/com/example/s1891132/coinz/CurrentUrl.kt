@@ -4,6 +4,7 @@ import android.support.annotation.VisibleForTesting
 import java.util.*
 
 @VisibleForTesting
+//The date needs to be in the format of yyyy/mm/dd
 fun currentDate():String {
     val calendar=Calendar.getInstance()
     val year=calendar.get(Calendar.YEAR).toString()

@@ -37,9 +37,10 @@ class BankCoinzActivity : AppCompatActivity() {
             R.id.coin_I_collect -> {
                 //show the list of coinz that the user collect himself
 
-                hint_bank.visibility=View.INVISIBLE
+                hint_bank.visibility=View.INVISIBLE //hide the information "click something to operate"
                 listView.visibility=View.INVISIBLE
-                hint_no_coin_bank.visibility=View.INVISIBLE
+                hint_no_coin_bank.visibility=View.INVISIBLE //hide the infomation of "no coinz in bank"
+
                 val coinSelfCollectList:ArrayList<Coin> = ArrayList()
 
                 FirestoreUtil.coinSelfCollectListRef.get()
@@ -56,6 +57,8 @@ class BankCoinzActivity : AppCompatActivity() {
                                 val adapter= CoinAdapter(this, coinSelfCollectList)
                                 listView.adapter = adapter
                                 listView.visibility=View.VISIBLE
+
+
                                 listView.onItemClickListener = AdapterView.OnItemClickListener{ _, view, position, _->
                                     FirestoreUtil.currentUserDocRef.get().addOnSuccessListener { document->
                                         if(document!=null)
@@ -68,7 +71,7 @@ class BankCoinzActivity : AppCompatActivity() {
                                                 //update bank account balance
                                                 val coin=coinSelfCollectList[position]
                                                 updateBalance(coin.type,coin.value)
-                                                FirestoreUtil.updateBankNumToday()
+                                                FirestoreUtil.updateBankNumToday()//add one in the number of coinz that has been banked
                                                 FirestoreUtil.deleteCoinInList(FirestoreUtil.coinSelfCollectListRef,coin.id)
                                                 adapter.remove(position)//remove the coin in the listview
                                                 contentView?.snackbar("Successfully bank!")
@@ -84,11 +87,12 @@ class BankCoinzActivity : AppCompatActivity() {
 
         //show the list of coinz from friends
             R.id.coin_from_friend -> {
-                hint_bank.visibility=View.INVISIBLE
+                hint_bank.visibility=View.INVISIBLE//hide the information "click something to operate"
                 listView.visibility=View.INVISIBLE
-                hint_no_coin_bank.visibility=View.INVISIBLE
+                hint_no_coin_bank.visibility=View.INVISIBLE//hide the infomation of "no coinz in bank"
 
                 val coinFromFreindsList:ArrayList<Coin> = ArrayList()
+
                 FirestoreUtil.coinFromOthersRef.get()
                         .addOnSuccessListener {result->
                             if(result.isEmpty)
@@ -100,9 +104,11 @@ class BankCoinzActivity : AppCompatActivity() {
                                     val coin=document.toObject(Coin::class.java)
                                     coinFromFreindsList.add(coin)
                                 }
+
                                 val adapter= CoinAdapter(this, coinFromFreindsList)
                                 listView.adapter = adapter
                                 listView.visibility=View.VISIBLE
+
                                 listView.onItemClickListener = AdapterView.OnItemClickListener{_, _, position, _->
                                     val coin=coinFromFreindsList[position]
                                     updateBalance(coin.type,coin.value)
@@ -120,7 +126,9 @@ class BankCoinzActivity : AppCompatActivity() {
                 hint_bank.visibility=View.INVISIBLE
                 listView.visibility=View.VISIBLE
                 hint_no_coin_bank.visibility=View.INVISIBLE
+
                 contentView?.snackbar("Here you can convert the balance for each type of currency in your bank account to gold.")
+
                 //parse GeoJson information in the shared preference file to get the rate
                 val jsonObject= JSONObject(coinInfo)
                 val jsonRate=jsonObject.getJSONObject("rates")
@@ -184,7 +192,8 @@ class BankCoinzActivity : AppCompatActivity() {
     private fun updateBalance(type:String,value:Double){
         if(type.equals("PENY",true))
         {
-            FirestoreUtil.updateAccountBalance(value,0.0,0.0,0.0,1)
+            FirestoreUtil.updateAccountBalance(value,0.0,0.0,0.0,1)//add value in bank account
+            //deduct value in local wallet
             FirestoreUtil.updateWalletBalance(FirestoreUtil.currentUserDocRef,value,0.0,0.0,0.0,-1)
         }
         else if(type.equals("DOLR",true))

@@ -9,6 +9,7 @@
     android:weightSum="10"
     android:baselineAligned="false">
 
+    <!-- the adapter for coinz list view in bank -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

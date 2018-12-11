@@ -24,7 +24,7 @@ class MyAccountFragment : Fragment() {
 
             save_account_info.setOnClickListener{
                 FirestoreUtil.updateCurrentUserProfile(edit_name.text.toString(), edit_bio.text.toString())
-                view.snackbar("Changes saved!")
+                view.snackbar("Changes saved!")//save the changes of modification on user profile
             }
         }
         return view
@@ -32,10 +32,11 @@ class MyAccountFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        //show the user's profile information
         FirestoreUtil.getCurrentUser { CoinzUser ->
             if (this@MyAccountFragment.isVisible)
-                edit_name.setText(CoinzUser.name)//This is a editText, so use setText
-            email_address_text.text = CoinzUser.email//This is a TextView, so use ".text="
+                edit_name.setText(CoinzUser.name)
+            email_address_text.text = CoinzUser.email
             uid.text = CoinzUser.id
             edit_bio.setText(CoinzUser.bio)
             walking_distance_text.text = CoinzUser.walkingDistance.toString()
