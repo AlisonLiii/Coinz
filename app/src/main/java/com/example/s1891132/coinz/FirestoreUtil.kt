@@ -407,13 +407,14 @@ object FirestoreUtil {
                 //zero out user's wallet
                 updateWalletBalance(currentUserDocRef,0.0,0.0,0.0,0.0,0)
 
-                //delete all the coinz that user collect himself, but not zero out the coinz from friends
+                //delete all the coinz that user collect himself of yesterday
                 coinSelfCollectListRef.get().addOnSuccessListener{documents->
                     for(document in documents){
                        coinSelfCollectListRef.document(document.id).delete()
                     }
                 }
 
+                //delete all the coinz from friend of yesterday
                 coinSelfCollectListRef.get().addOnSuccessListener{documents->
                     for(document in documents){
                         coinSelfCollectListRef.document(document.id).delete()

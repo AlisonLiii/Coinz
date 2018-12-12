@@ -59,8 +59,6 @@ class ShareCoinzActivity : AppCompatActivity() {
                         listView.onItemClickListener = AdapterView.OnItemClickListener{ _, view, position, _ ->
                             val coin=coinList[position]
                             FirestoreUtil.shareCoinz(contentView!!,otherUserID,coin,adapter,position)//Share the certain coin user selects to his friends
-
-                            //adapter.remove(position)//remove the coin which has been sent from the list
                         }
 
                     }
