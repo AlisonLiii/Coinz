@@ -4,6 +4,7 @@ import android.content.Context
 import android.support.annotation.VisibleForTesting
 import android.util.Log
 import android.view.View
+import com.example.s1891132.coinz.adapterForListView.CoinShareAdapter
 import com.example.s1891132.coinz.dataClassAndItem.Coin
 import com.example.s1891132.coinz.dataClassAndItem.CoinzUser
 import com.example.s1891132.coinz.dataClassAndItem.PersonItem
@@ -74,7 +75,7 @@ object FirestoreUtil {
     fun initCurrentUserIfFirstTime(name:String,camp:Double, onComplete: () -> Unit) {
         currentUserDocRef.get().addOnSuccessListener { documentSnapshot ->
             if (!documentSnapshot.exists()) {//Create user profile if the user's profile doesn't exist before
-                val newUser = CoinzUser(name, FirebaseAuth.getInstance().currentUser!!.uid, FirebaseAuth.getInstance().currentUser!!.email!!, "", camp, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, currentDate(), 0.0)//TODO:maybe a null-safety problem here
+                val newUser = CoinzUser(name, FirebaseAuth.getInstance().currentUser!!.uid, FirebaseAuth.getInstance().currentUser!!.email!!, "", camp, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, currentDate(), 0.0)
                 currentUserDocRef.set(newUser).addOnSuccessListener {
                     onComplete()
                 }
@@ -277,50 +278,62 @@ object FirestoreUtil {
     /**
      * Share coins to friends Pattern
      */
-    fun shareCoinz(view: View, otherID:String, coin: Coin){
+    fun shareCoinz(view: View, otherID:String, coin: Coin,adapter:CoinShareAdapter,position:Int){
 
         val otherUserDocRef= firestoreInstance.collection("users").document(otherID)
         //The collection reference of coins from others
         val otherUserCollRef= otherUserDocRef.collection("coinFromOthers")
 
         //add coins in user's friend's list
-        otherUserCollRef.document(coin.id).collection("users").document(otherID)
-                .get().addOnSuccessListener { documentSnapshot ->
-            if(!documentSnapshot.exists()) {
-                otherUserCollRef.document(coin.id).set(coin)
-            }
-            else {
-                //user cannot own the same coin from more than one friend
-                //But he can receive the coin from B after he bank the coin with the same id from A into his account
-                view.snackbar("Sent fail. Your friend already has this coin from other friends! Tell him to bank that coin into account first, and you can resend the coin")
-            }
-        }
-        //also, user can only share coins he collect himself to his friends.
+        otherUserDocRef.get().addOnSuccessListener { document->
+            if(document.exists())
+            {
+                if(document["date"]== currentDate())
+                {
+                    otherUserCollRef.document(coin.id).collection("users").document(otherID)
+                            .get().addOnSuccessListener { documentSnapshot ->
+                                if(!documentSnapshot.exists()) {
+                                    otherUserCollRef.document(coin.id).set(coin)
+                                }
+                                else {
+                                    //user cannot own the same coin from more than one friend
+                                    //But he can receive the coin from B after he bank the coin with the same id from A into his account
+                                    view.snackbar("Sent fail. Your friend already has this coin from other friends! Tell him to bank that coin into account first, and you can resend the coin")
+                                }
+                            }
+                    //also, user can only share coins he collect himself to his friends.
 
-        //delete coin in user's list
-        deleteCoinInList(FirestoreUtil.coinSelfCollectListRef,coin.id)
+                    //delete coin in user's list
+                    deleteCoinInList(FirestoreUtil.coinSelfCollectListRef,coin.id)
 
-        //update the wallet balance of user's and his friend's
-        if(coin.type.equals("PENY",true))
-        {
-            updateWalletBalance(currentUserDocRef,coin.value,0.0,0.0,0.0,-1)
-            updateWalletBalance(otherUserDocRef,coin.value,0.0,0.0,0.0,1)
+                    //update the wallet balance of user's and his friend's
+                    if(coin.type.equals("PENY",true))
+                    {
+                        updateWalletBalance(currentUserDocRef,coin.value,0.0,0.0,0.0,-1)
+                        updateWalletBalance(otherUserDocRef,coin.value,0.0,0.0,0.0,1)
+                    }
+                    else if(coin.type.equals("DOLR",true))
+                    {
+                        updateWalletBalance(currentUserDocRef,0.0,coin.value,0.0,0.0,-1)
+                        updateWalletBalance(otherUserDocRef,0.0,coin.value,0.0,0.0,1)
+                    }
+                    else if(coin.type.equals("SHIL",true))
+                    {
+                        updateWalletBalance(currentUserDocRef,0.0,0.0,coin.value,0.0,-1)
+                        updateWalletBalance(otherUserDocRef,0.0,0.0,coin.value,0.0,1)
+                    }
+                    else
+                    {
+                        updateWalletBalance(currentUserDocRef,0.0,0.0,0.0,coin.value,-1)
+                        updateWalletBalance(otherUserDocRef,0.0,0.0,0.0,coin.value,1)
+                    }
+                    view.snackbar("sent!")
+                    adapter.remove(position)//remove the coin which has been sent from the list
+                }
+                else view.snackbar("This user doesn't have log-in record today. You cannot share the coin to him.")
+            }
         }
-        else if(coin.type.equals("DOLR",true))
-        {
-            updateWalletBalance(currentUserDocRef,0.0,coin.value,0.0,0.0,-1)
-            updateWalletBalance(otherUserDocRef,0.0,coin.value,0.0,0.0,1)
-        }
-        else if(coin.type.equals("SHIL",true))
-        {
-            updateWalletBalance(currentUserDocRef,0.0,0.0,coin.value,0.0,-1)
-            updateWalletBalance(otherUserDocRef,0.0,0.0,coin.value,0.0,1)
-        }
-        else
-        {
-            updateWalletBalance(currentUserDocRef,0.0,0.0,0.0,coin.value,-1)
-            updateWalletBalance(otherUserDocRef,0.0,0.0,0.0,coin.value,1)
-        }
+
     }
 
     /**
@@ -398,6 +411,12 @@ object FirestoreUtil {
                 coinSelfCollectListRef.get().addOnSuccessListener{documents->
                     for(document in documents){
                        coinSelfCollectListRef.document(document.id).delete()
+                    }
+                }
+
+                coinSelfCollectListRef.get().addOnSuccessListener{documents->
+                    for(document in documents){
+                        coinSelfCollectListRef.document(document.id).delete()
                     }
                 }
                 //zero out the marker list of yesterday

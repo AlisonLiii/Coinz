@@ -44,6 +44,8 @@ import static org.hamcrest.Matchers.is;
     2)whether user's information like id, email address, camp and walking distance has been displayed
   */
 
+ //if the emulator asks to update google play service, make sure to test after updating
+
 
 @RunWith(AndroidJUnit4.class)
 public class AccountModifyTest {
