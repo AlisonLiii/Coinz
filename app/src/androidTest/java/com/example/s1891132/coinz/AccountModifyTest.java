@@ -44,8 +44,9 @@ import static org.hamcrest.Matchers.is;
     2)whether user's information like id, email address, camp and walking distance has been displayed
   */
 
- //if the emulator asks to update google play service, make sure to test after updating
-
+ //if the emulator asks to update google play service, please make sure to test after updating!
+//Sometimes the test will fail because the emulator is working unexpectedly slow and therefore the sleeping time interval is too short..
+//Just modify the sleeping interval to pass the test
 
 @RunWith(AndroidJUnit4.class)
 public class AccountModifyTest {

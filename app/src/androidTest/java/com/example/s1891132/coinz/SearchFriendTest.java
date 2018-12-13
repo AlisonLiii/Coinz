@@ -44,6 +44,10 @@ public class SearchFriendTest {
 3) if user search for a unregistered email address, he will fail to go to ShareCoinzActivity and get a hint in snackbar
 * */
 
+    //if the emulator asks to update google play service, please make sure to test after updating!
+//Sometimes the test will fail because the emulator is working unexpectedly slow and therefore the sleeping time interval is too short..
+//Just modify the sleeping interval to pass the test
+
 
 
     //to check whether user can search for an email and then go to ShareCoinzActivity

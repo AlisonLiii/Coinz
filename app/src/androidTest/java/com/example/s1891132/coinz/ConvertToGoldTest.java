@@ -44,6 +44,10 @@ public class ConvertToGoldTest {
 
     //To check whether the app can give hints after clicking exchange gold in bank
 
+
+    //if the emulator asks to update google play service, please make sure to test after updating!
+//Sometimes the test will fail because the emulator is working unexpectedly slow and therefore the sleeping time interval is too short..
+//Just modify the sleeping interval to pass the test
     @Rule
     public ActivityTestRule<SplashActivity> mActivityTestRule = new ActivityTestRule<>(SplashActivity.class);
     @Rule

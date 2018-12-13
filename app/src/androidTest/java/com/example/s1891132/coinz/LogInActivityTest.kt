@@ -28,6 +28,10 @@ class LogInActivityTest {
     3) When the input of the password is correct, the user will be directed to MainActivity
     */
 
+    //if the emulator asks to update google play service, please make sure to test after updating!
+//Sometimes the test will fail because the emulator is working unexpectedly slow and therefore the sleeping time interval is too short..
+//Just modify the sleeping interval to pass the test
+
     @Rule
     @JvmField
     val rule  = IntentsTestRule(LogInActivity::class.java)

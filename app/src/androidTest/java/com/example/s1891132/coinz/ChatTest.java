@@ -48,6 +48,9 @@ public class ChatTest {
     2)whether message can be sent from users
     3)whether user can go to ShareCoinzActivity after clicking on the lower left button on the chat page
      */
+    //if the emulator asks to update google play service, please make sure to test after updating!
+//Sometimes the test will fail because the emulator is working unexpectedly slow and therefore the sleeping time interval is too short..
+//Just modify the sleeping interval to pass the test
     @Test
     public void chatTest() {
         //if the user never signed in before

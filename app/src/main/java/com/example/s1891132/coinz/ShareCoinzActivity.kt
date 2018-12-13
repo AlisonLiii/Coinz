@@ -8,6 +8,7 @@ import android.widget.AdapterView
 import android.widget.ListView
 import com.example.s1891132.coinz.adapterForListView.CoinShareAdapter
 import com.example.s1891132.coinz.dataClassAndItem.Coin
+import com.example.s1891132.coinz.dataClassAndItem.CoinzUser
 import kotlinx.android.synthetic.main.activity_share_coinz.*
 import org.jetbrains.anko.contentView
 import org.jetbrains.anko.design.snackbar
@@ -58,7 +59,10 @@ class ShareCoinzActivity : AppCompatActivity() {
                         //click on the coin and share to friend
                         listView.onItemClickListener = AdapterView.OnItemClickListener{ _, view, position, _ ->
                             val coin=coinList[position]
-                            FirestoreUtil.shareCoinz(contentView!!,otherUserID,coin,adapter,position)//Share the certain coin user selects to his friends
+                            FirestoreUtil.getCurrentUser { CoinzUser->
+                                FirestoreUtil.shareCoinz(contentView!!,otherUserID,coin,adapter,position, CoinzUser.bankNum)//Share the certain coin user selects to his friends
+                            }
+
                         }
 
                     }

@@ -38,6 +38,10 @@ import static org.hamcrest.Matchers.allOf;
 public class MapAndMarkerExistTest {
 
     //To test whether the mapview and the marker is shown
+
+    //if the emulator asks to update google play service, please make sure to test after updating!
+//Sometimes the test will fail because the emulator is working unexpectedly slow and therefore the sleeping time interval is too short..
+//Just modify the sleeping interval to pass the test
     @Rule
     public ActivityTestRule<SplashActivity> mActivityTestRule = new ActivityTestRule<>(SplashActivity.class);
     @Rule

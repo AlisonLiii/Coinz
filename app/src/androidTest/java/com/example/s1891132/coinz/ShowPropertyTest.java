@@ -46,6 +46,10 @@ public class ShowPropertyTest {
     2) whether user can go to BankCoinzActivity after clicking on the button "go banking!"
     3) whether user can go back to the map in the BankCoinzActivity after clicking the button "Back to Map"
     */
+
+    //if the emulator asks to update google play service, please make sure to test after updating!
+//Sometimes the test will fail because the emulator is working unexpectedly slow and therefore the sleeping time interval is too short..
+//Just modify the sleeping interval to pass the test
     @Test
     public void showPropertyTest() {
         //if the user never signed in before
