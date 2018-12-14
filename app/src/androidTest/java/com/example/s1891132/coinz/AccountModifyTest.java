@@ -48,6 +48,14 @@ import static org.hamcrest.Matchers.is;
 //Sometimes the test will fail because the emulator is working unexpectedly slow and therefore the sleeping time interval is too short..
 //Just modify the sleeping interval to pass the test
 
+/*Automated Testing need an account to sign in.
+In my Firebase console, there is already an account existing for testing.
+ If the testings fail because you cannot connect to my set-up Firebase and the user accounts don’t exist,
+ please create a player account whose username is “test1@gmail.com” and password is “testtest”
+ and another account whose username is test2@gmail.com and password is “testtest” to make the testings pass.
+*/
+
+
 @RunWith(AndroidJUnit4.class)
 public class AccountModifyTest {
 

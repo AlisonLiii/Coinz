@@ -40,6 +40,10 @@ public class RegisterFailureTest {
     3)the email has been registered before, so that user fail to register
      */
 
+    //sometimes the test will fail because of some unexpected pop-up windows on emulators such as telling you whether to remember the password
+    //after clicking those pop-up window, try to run the test for more times and it will pass.
+
+
     //if the emulator asks to update google play service, please make sure to test after updating!
 //Sometimes the test will fail because the emulator is working unexpectedly slow and therefore the sleeping time interval is too short..
 //Just modify the sleeping interval to pass the test
